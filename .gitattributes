@@ -1,0 +1,2 @@
+# Dependency patches contain significant unified-diff context whitespace.
+*.patch text eol=lf -whitespace

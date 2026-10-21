@@ -1,0 +1,84 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "stenzo-containers-preview",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-15",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": false,
+  "preview_urls": false,
+  "observability": {
+    "enabled": false,
+  },
+  "containers": [
+    {
+      "class_name": "ApiContainer",
+      "image": "./api/Dockerfile",
+      "image_build_context": "../..",
+      "instance_type": "basic",
+      "max_instances": 1,
+    },
+    {
+      "class_name": "MiniappContainer",
+      "image": "./miniapp/Dockerfile",
+      "image_build_context": "../..",
+      "instance_type": "basic",
+      "max_instances": 1,
+    },
+    {
+      "class_name": "AdminContainer",
+      "image": "./admin/Dockerfile",
+      "image_build_context": "../..",
+      "instance_type": "basic",
+      "max_instances": 1,
+    },
+    {
+      "class_name": "BotContainer",
+      "image": "./bot/Dockerfile",
+      "image_build_context": "../..",
+      "instance_type": "lite",
+      "max_instances": 1,
+    },
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "API",
+        "class_name": "ApiContainer",
+      },
+      {
+        "name": "MINIAPP",
+        "class_name": "MiniappContainer",
+      },
+      {
+        "name": "ADMIN",
+        "class_name": "AdminContainer",
+      },
+      {
+        "name": "BOT",
+        "class_name": "BotContainer",
+      },
+    ],
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": [
+        "ApiContainer",
+        "MiniappContainer",
+        "AdminContainer",
+        "BotContainer",
+      ],
+    },
+  ],
+  "vars": {
+    "API_HOST": "api.preview.invalid",
+    "MINIAPP_HOST": "miniapp.preview.invalid",
+    "ADMIN_HOST": "admin.preview.invalid",
+    "BOT_HOST": "bot.preview.invalid",
+    "API_URL": "https://api.preview.invalid",
+    "ADMIN_ORIGIN": "https://admin.preview.invalid",
+    "MINI_APP_URL": "https://miniapp.preview.invalid",
+    "STORAGE_PUBLIC_BASE_URL": "https://api.preview.invalid/media",
+    "ADMIN_TELEGRAM_IDS": "",
+  },
+}

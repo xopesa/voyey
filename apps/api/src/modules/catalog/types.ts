@@ -1,0 +1,113 @@
+export interface CatalogCategoryRecord {
+  archivedAt?: Date | null;
+  id: string;
+  nameRu: string;
+  nameUz: string;
+  slug: string;
+  sortOrder: number;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CatalogImageRecord {
+  id: string;
+  productId: string;
+  url: string;
+  storageKey: string | null;
+  sortOrder: number;
+  isPrimary: boolean;
+  createdAt: Date;
+}
+
+export interface CatalogVariantRecord {
+  id: string;
+  productId: string;
+  sku: string;
+  size: string;
+  color: string | null;
+  stock: number | null;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CatalogProductRecord {
+  archivedAt?: Date | null;
+  id: string;
+  categoryId: string;
+  nameRu: string;
+  nameUz: string;
+  slug: string;
+  descriptionRu: string | null;
+  descriptionUz: string | null;
+  price: number;
+  salePrice?: number | null;
+  saleStartsAt?: Date | null;
+  saleEndsAt?: Date | null;
+  currency: "UZS";
+  status: "DRAFT" | "ACTIVE" | "INACTIVE";
+  isFeatured: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  category: CatalogCategoryRecord;
+  images: CatalogImageRecord[];
+  variants: CatalogVariantRecord[];
+}
+
+export interface CatalogProductListQuery {
+  category?: string;
+  search?: string;
+  limit: number;
+  cursor?: string;
+}
+
+export interface CatalogProductListResult {
+  products: CatalogProductRecord[];
+  nextCursor: string | null;
+}
+
+export interface CategoryDto {
+  id: string;
+  nameRu: string;
+  nameUz: string;
+  slug: string;
+  sortOrder: number;
+}
+
+export interface ProductImageDto {
+  id: string;
+  url: string;
+  sortOrder: number;
+  isPrimary: boolean;
+}
+
+export interface ProductVariantDto {
+  id: string;
+  sku: string;
+  size: string;
+  color: string | null;
+  stock: number | null;
+  isAvailable: boolean;
+}
+
+export interface ProductDto {
+  effectivePrice: number;
+  isOnSale: boolean;
+  id: string;
+  nameRu: string;
+  nameUz: string;
+  slug: string;
+  descriptionRu: string | null;
+  descriptionUz: string | null;
+  price: number;
+  salePrice?: number | null;
+  saleStartsAt?: Date | null;
+  saleEndsAt?: Date | null;
+  currency: "UZS";
+  isFeatured: boolean;
+  category: CategoryDto;
+  images: ProductImageDto[];
+  variants: ProductVariantDto[];
+  availableSizes: string[];
+}

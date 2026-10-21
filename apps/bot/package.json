@@ -1,0 +1,31 @@
+{
+  "name": "@stenzo/bot",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": "24.x"
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/index.js",
+    "lint": "eslint src tests",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/**/*.test.ts"
+  },
+  "dependencies": {
+    "@stenzo/database": "workspace:*",
+    "@stenzo/shared": "workspace:*",
+    "dotenv": "^17.2.2",
+    "grammy": "^1.38.3",
+    "zod": "^4.1.11"
+  },
+  "devDependencies": {
+    "@stenzo/config": "workspace:*",
+    "@types/node": "^24.5.2",
+    "eslint": "^9.36.0",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2"
+  }
+}

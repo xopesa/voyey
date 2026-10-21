@@ -1,0 +1,31 @@
+{
+  "name": "stenzo-cloudflare-free",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.17.1",
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "node scripts/build.mjs",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "format": "prettier --write .",
+    "db:generate": "pnpm --filter @stenzo/database db:generate",
+    "db:migrate": "pnpm --filter @stenzo/database db:migrate",
+    "db:migrate:deploy": "pnpm --filter @stenzo/database db:migrate:deploy",
+    "db:seed": "pnpm --filter @stenzo/database db:seed",
+    "admin:password": "pnpm --filter @stenzo/api admin:password"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.36.0",
+    "eslint": "^9.36.0",
+    "globals": "^16.4.0",
+    "prettier": "^3.6.2",
+    "turbo": "^2.5.8",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.44.1"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "@stenzo/shared",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@stenzo/config": "workspace:*",
+    "@types/node": "^24.5.2",
+    "eslint": "^9.36.0",
+    "typescript": "^5.9.2"
+  }
+}

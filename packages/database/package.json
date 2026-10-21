@@ -1,0 +1,39 @@
+{
+  "name": "@stenzo/database",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "db:generate": "node scripts/prisma.mjs generate",
+    "db:validate": "node scripts/prisma.mjs validate",
+    "db:migrate": "node -e \"throw new Error('Use the dedicated D1 migration command, never PostgreSQL migration commands')\"",
+    "db:migrate:deploy": "node -e \"throw new Error('Use the dedicated D1 migration command, never PostgreSQL migration commands')\"",
+    "db:seed": "node -e \"throw new Error('PostgreSQL seeds are disabled in this independent D1 target')\""
+  },
+  "dependencies": {
+    "@prisma/client": "^6.16.2",
+    "dotenv": "17.2.2"
+  },
+  "devDependencies": {
+    "@stenzo/config": "workspace:*",
+    "@types/node": "^24.5.2",
+    "eslint": "^9.36.0",
+    "prisma": "^6.16.2",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  }
+}

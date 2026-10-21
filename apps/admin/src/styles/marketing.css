@@ -1,0 +1,61 @@
+.marketing-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+.marketing-cards .editor {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+.marketing-cards a:hover {
+  border-color: var(--dashboard-accent);
+}
+.marketing-link {
+  color: var(--dashboard-accent);
+  font-size: 12px;
+  margin-top: 12px;
+}
+.banner-thumbnail {
+  width: 120px;
+  height: 65px;
+  object-fit: cover;
+  border-radius: 9px;
+  display: block;
+}
+.banner-editor-image {
+  max-width: 100%;
+  width: 360px;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 16px;
+  margin-top: 20px;
+}
+@media (max-width: 760px) {
+  .marketing-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.marketing-info {
+  margin-top: 20px;
+}
+.marketing-info a {
+  display: block;
+}
+
+.marketing-info .editor {
+  margin-bottom: 0;
+}
+.admin-section-shell fieldset.form-grid {
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}

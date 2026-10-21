@@ -1,0 +1,281 @@
+.payment-page {
+  display: grid;
+  gap: var(--space-5);
+  padding-top: var(--space-4);
+}
+.payment-heading h1 {
+  font-size: var(--text-heading);
+  line-height: var(--leading-heading);
+  letter-spacing: var(--tracking-heading);
+  margin: 0.4rem 0 0;
+}
+.payment-receipt {
+  padding: 0;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+.payment-receipt__brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-5);
+  gap: var(--space-3);
+}
+.payment-receipt__brand .brand {
+  min-width: 0;
+  gap: var(--space-2);
+}
+.payment-receipt__brand .brand__mark {
+  width: 26px;
+  height: 24px;
+  flex-shrink: 0;
+}
+.payment-receipt__brand .brand__name {
+  font-size: 1.1rem;
+  white-space: nowrap;
+}
+.payment-receipt__brand .brand__wear {
+  font-size: 0.5rem;
+}
+.payment-receipt__brand .brand__type {
+  overflow-wrap: normal;
+}
+.payment-receipt__brand > span {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.payment-receipt__meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: 0 var(--space-5) var(--space-5);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  overflow-wrap: anywhere;
+}
+.payment-receipt__amount {
+  background: var(--background-badge-active);
+  color: var(--text-badge-active);
+  padding: var(--space-6) var(--space-5);
+}
+.payment-receipt__amount p {
+  font-size: var(--text-label);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 0 0 var(--space-5);
+}
+.payment-receipt__amount > span {
+  display: block;
+  font-size: var(--text-small);
+  opacity: 0.8;
+}
+.payment-receipt__amount strong {
+  display: block;
+  font-size: clamp(1.65rem, 7vw, 2.25rem);
+  line-height: 1.25;
+  letter-spacing: -0.055em;
+  margin-top: var(--space-2);
+  overflow-wrap: anywhere;
+}
+.payment-breakdown {
+  margin: 0;
+  padding: var(--space-5);
+  display: grid;
+  gap: var(--space-3);
+}
+.payment-breakdown > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-3);
+  font-size: var(--text-small);
+}
+.payment-breakdown dt {
+  color: var(--text-secondary);
+  min-width: 0;
+}
+.payment-breakdown dd {
+  margin: 0;
+  white-space: nowrap;
+  font-weight: var(--weight-semibold);
+}
+.payment-status {
+  border-top: 1px dashed var(--border-default);
+  padding: var(--space-6) var(--space-5);
+  text-align: center;
+}
+.payment-status__steps {
+  display: flex;
+  align-items: center;
+  margin: 0 auto var(--space-5);
+  max-width: 230px;
+}
+.payment-status__steps span {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--background-raised);
+  color: var(--text-secondary);
+  font-size: var(--text-small);
+  font-weight: var(--weight-semibold);
+}
+.payment-status__steps span[data-active="true"] {
+  background: var(--background-accent);
+  color: var(--text-inverse);
+}
+.payment-status__steps i {
+  flex: 1;
+  height: 1px;
+  background: var(--border-default);
+}
+.payment-status h2,
+.payment-bank h2,
+.payment-proof h2,
+.payment-context h2 {
+  font-size: var(--text-section);
+  letter-spacing: -0.035em;
+  line-height: 1.25;
+  margin: 0;
+}
+.payment-status p,
+.payment-bank p,
+.payment-proof p,
+.payment-context p {
+  color: var(--text-secondary);
+  font-size: var(--text-small);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.payment-status[data-state="rejected"] h2 {
+  color: var(--text-danger);
+}
+.payment-status .payment-review-label {
+  color: var(--text-accent);
+  font-weight: var(--weight-semibold);
+}
+.payment-bank,
+.payment-proof {
+  display: grid;
+  gap: var(--space-3);
+}
+.payment-bank p,
+.payment-proof p {
+  margin: 0;
+}
+.payment-bank .payment-bank__number {
+  font-size: clamp(1rem, 4.4vw, 1.25rem);
+  color: var(--text-primary);
+  letter-spacing: 0.025em;
+  font-variant-numeric: tabular-nums;
+}
+.payment-bank > span {
+  color: var(--text-accent);
+  font-size: var(--text-small);
+}
+.payment-bank__due {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: space-between;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: var(--space-4);
+  font-size: var(--text-small);
+}
+.payment-proof input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+}
+.payment-proof__preview {
+  background: var(--background-raised);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.payment-proof__preview img {
+  display: block;
+  width: 100%;
+  max-height: 280px;
+  object-fit: contain;
+}
+.payment-proof .payment-proof__privacy {
+  font-size: var(--text-xs);
+}
+.payment-error {
+  display: grid;
+  gap: var(--space-3);
+}
+.payment-error p,
+.payment-proof .payment-error__text {
+  color: var(--text-danger);
+  font-size: var(--text-small);
+  margin: 0;
+}
+.payment-context {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+.payment-context__photos {
+  display: flex;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+.payment-context__photos > div {
+  width: 50px;
+  height: 66px;
+  position: relative;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.payment-context__photos .cart-item__photo {
+  height: 100%;
+  width: 100%;
+}
+.payment-context p {
+  margin: var(--space-2) 0;
+}
+.payment-context strong {
+  font-size: var(--text-small);
+}
+.payment-context > div:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.payment-links {
+  display: grid;
+  gap: var(--space-3);
+}
+.payment-skeleton {
+  height: 400px;
+  border-radius: var(--radius-xl);
+}
+.payment-skeleton--small {
+  height: 150px;
+}
+.app-shell[data-payment="true"] .app-shell__scroll {
+  padding-bottom: calc(
+    var(--safe-bottom) + var(--checkout-action-height, 0px) + 40px
+  );
+}
+.payment-actions > button {
+  width: 100%;
+}
+@media (max-width: 350px) {
+  .payment-breakdown {
+    padding: var(--space-4);
+  }
+  .payment-receipt__amount {
+    padding: var(--space-5) var(--space-4);
+  }
+  .payment-context__photos > div:nth-child(2) {
+    display: none;
+  }
+}

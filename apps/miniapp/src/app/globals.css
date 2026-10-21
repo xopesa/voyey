@@ -1,0 +1,67 @@
+@import "../styles/tokens.css";
+@import "../styles/foundation.css";
+@import "../styles/shell.css";
+@import "../styles/settings.css";
+@import "../styles/home.css";
+
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  min-inline-size: 0;
+  background: var(--background-app);
+  color: var(--text-primary);
+}
+html {
+  font-family: var(--font-ui);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+body {
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  -webkit-font-smoothing: antialiased;
+}
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+a {
+  color: inherit;
+}
+button,
+svg {
+  flex-shrink: 0;
+}
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+:focus-visible {
+  outline: var(--focus-width) solid var(--border-focus);
+  outline-offset: var(--focus-offset);
+}
+::selection {
+  background: var(--color-lime);
+  color: var(--color-charcoal);
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

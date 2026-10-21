@@ -1,0 +1,12 @@
+{
+  "name": "stenzo-turon-admin",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "start": "node server.js"
+  }
+}

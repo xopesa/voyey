@@ -1,0 +1,266 @@
+/* Presentation only: existing forms, tables and actions keep their behaviour. */
+.admin-section-shell .content,
+.admin-section-shell .content > *,
+.admin-section-shell :is(.form-grid, .editor, .list-panel, .table-scroll) {
+  min-width: 0;
+}
+.admin-section-shell .page-heading {
+  margin-bottom: 26px;
+  gap: 24px;
+}
+.admin-section-shell .page-heading h1 {
+  margin: 10px 0;
+  font-size: clamp(28px, 3vw, 38px);
+  letter-spacing: -1.1px;
+}
+.admin-section-shell .eyebrow {
+  color: var(--muted);
+  font-size: 9px;
+  letter-spacing: 2.2px;
+}
+.admin-section-shell .page-heading .muted {
+  font-size: 13px;
+  max-width: 760px;
+}
+.admin-section-shell :is(.editor, .list-panel) {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background:
+    radial-gradient(ellipse at 100% 0, rgb(166 255 0 / 4%), transparent 55%),
+    var(--surface);
+}
+.admin-section-shell .editor {
+  padding: 24px;
+}
+.admin-section-shell .editor :is(h2, h3) {
+  color: var(--text);
+}
+.admin-section-shell h2 {
+  font-size: 18px;
+}
+.admin-section-shell :is(.product-filters, .order-filters) {
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  gap: 14px;
+}
+.admin-section-shell label {
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+}
+.admin-section-shell :is(input, select, textarea) {
+  color: var(--text);
+  border-color: var(--border);
+  background: var(--field);
+  border-radius: 9px;
+  max-width: 100%;
+  min-height: 42px;
+  font-size: 13px;
+}
+.admin-section-shell input::placeholder,
+.admin-section-shell textarea::placeholder {
+  color: var(--muted);
+  opacity: 0.7;
+}
+.admin-section-shell :is(input, select, textarea):focus-visible {
+  border-color: var(--dashboard-accent);
+  outline: 2px solid var(--dashboard-accent);
+  outline-offset: 2px;
+}
+.admin-section-shell input[type="checkbox"] {
+  min-height: 18px;
+  flex: 0 0 18px;
+  accent-color: var(--dashboard-accent);
+}
+.admin-section-shell .content :is(button, .button) {
+  min-height: 40px;
+  border-radius: 9px;
+  background: var(--field);
+  color: var(--text);
+  border: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 600;
+}
+.admin-section-shell
+  .content
+  :is(.primary, .product-filters > button, .order-filters > button) {
+  background: var(--lime);
+  color: #101700;
+  border-color: var(--lime);
+}
+.admin-section-shell .content .quiet {
+  background: transparent;
+  color: var(--muted);
+}
+.admin-section-shell .content :is(button, .button):hover:not(:disabled) {
+  opacity: 1;
+  border-color: var(--dashboard-accent);
+}
+.admin-section-shell .content :is(button, .button):disabled {
+  opacity: 0.45;
+}
+.admin-section-shell .table-scroll {
+  position: relative;
+  max-width: 100%;
+  overscroll-behavior-x: contain;
+  scrollbar-color: var(--dashboard-accent) var(--surface);
+  scrollbar-width: thin;
+}
+.admin-section-shell table {
+  font-size: 12px;
+}
+.admin-section-shell th {
+  color: var(--muted);
+  background: var(--field);
+  padding: 14px 18px;
+  font-size: 10px;
+  font-weight: 500;
+}
+.admin-section-shell td {
+  color: var(--text);
+  padding: 18px;
+  border-top-color: var(--border);
+}
+.admin-section-shell tbody tr:hover {
+  background: color-mix(in srgb, var(--dashboard-accent) 3%, var(--surface));
+}
+.admin-section-shell .attention-row {
+  background: color-mix(in srgb, var(--dashboard-accent) 5%, var(--surface));
+}
+.admin-section-shell .attention-row td:first-child {
+  border-left-color: var(--dashboard-accent);
+}
+.admin-section-shell :is(.attention-label, .product-link:hover) {
+  color: var(--dashboard-accent);
+}
+.admin-section-shell .attention-label::before {
+  color: var(--dashboard-accent);
+}
+.admin-section-shell .row-actions {
+  gap: 8px;
+}
+.admin-section-shell .row-actions button {
+  min-height: 34px;
+  padding: 7px 11px;
+  font-size: 11px;
+}
+.admin-section-shell .badge {
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--field);
+  padding: 4px 8px;
+  font-size: 10px;
+}
+.admin-section-shell .badge.active {
+  color: var(--dashboard-accent);
+  border-color: color-mix(in srgb, var(--dashboard-accent) 25%, transparent);
+  background: var(--active-bg);
+}
+.admin-section-shell .badge.active span {
+  color: var(--dashboard-accent);
+}
+.admin-section-shell :is(.error, .notice, .review-hint) {
+  background: var(--surface);
+  border-radius: 10px;
+}
+.admin-section-shell .notice,
+.admin-section-shell .review-hint {
+  border-left-color: var(--dashboard-accent);
+}
+.admin-section-shell
+  :is(.finance-grid > div, .payment-review-card, .image-card) {
+  background: var(--field);
+  border-color: var(--border);
+  border-radius: 12px;
+}
+.admin-section-shell .finance-grid dd {
+  font-variant-numeric: tabular-nums;
+}
+.admin-section-shell .section-heading > :is(button, .button) {
+  background: var(--field);
+  color: var(--muted);
+}
+.admin-section-shell .telegram-settings {
+  max-width: none;
+}
+.admin-section-shell .telegram-settings:not(form) {
+  max-width: 960px;
+}
+.admin-section-shell form.telegram-settings {
+  display: grid;
+  grid-template-columns: minmax(160px, 1fr) minmax(160px, 1.5fr) auto;
+  align-items: end;
+}
+.admin-section-shell .telegram-settings .checkbox {
+  color: var(--text);
+}
+.admin-section-shell .state {
+  min-height: 230px;
+  gap: 14px;
+}
+.admin-section-shell .empty-icon {
+  color: var(--dashboard-accent);
+  opacity: 0.65;
+}
+.admin-section-shell
+  .content
+  :is(.editor-actions, .form-actions, .row-actions) {
+  flex-wrap: wrap;
+}
+@media (max-width: 1100px) {
+  .admin-section-shell .product-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .admin-section-shell .product-filters > button {
+    align-self: end;
+  }
+}
+@media (max-width: 760px) {
+  .admin-section-shell .page-heading {
+    align-items: stretch;
+    gap: 16px;
+  }
+  .admin-section-shell .editor,
+  .admin-section-shell :is(.product-filters, .order-filters) {
+    padding: 18px;
+  }
+  .admin-section-shell :is(.form-grid, form.telegram-settings) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .admin-section-shell form.telegram-settings button {
+    justify-self: stretch;
+  }
+  .admin-section-shell .content :is(.editor-actions, .form-actions) > button {
+    flex: 1 1 auto;
+  }
+}
+@media (max-width: 420px) {
+  .admin-section-shell
+    :is(.product-filters, .detail-grid, .finance-grid, .item-grid) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .admin-section-shell :is(.product-filters, .order-filters, .editor) {
+    padding: 16px;
+  }
+  .admin-section-shell .section-heading {
+    min-width: 0;
+  }
+}
+
+.admin-section-shell .channel-publication-choice {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.admin-section-shell .channel-publication-choice input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  margin: 0;
+  padding: 0;
+}

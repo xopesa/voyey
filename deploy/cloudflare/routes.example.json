@@ -1,0 +1,18 @@
+[
+  {
+    "pattern": "cf.stenzo.uz",
+    "custom_domain": true
+  },
+  {
+    "pattern": "cf-api.stenzo.uz",
+    "custom_domain": true
+  },
+  {
+    "pattern": "cf-admin.stenzo.uz",
+    "custom_domain": true
+  },
+  {
+    "pattern": "cf-bot.stenzo.uz",
+    "custom_domain": true
+  }
+]

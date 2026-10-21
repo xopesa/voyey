@@ -1,0 +1,21 @@
+diff --git a/lib/debug.js b/lib/debug.js
+index e7cdc6fc4ad6ca7df49ceef4ac6dc738ef9705f9..0fdfdf4fa45edbe6b2a74aceb194db4c211791fa 100644
+--- a/lib/debug.js
++++ b/lib/debug.js
+@@ -1,6 +1,6 @@
+ 'use strict'
+ 
+-const { debuglog } = require('node:util')
++// Cloudflare Workers: keep library debug logging disabled.
+ 
+ /**
+  * @callback DebugLogger
+@@ -12,7 +12,7 @@ const { debuglog } = require('node:util')
+ /**
+  * @type {DebugLogger}
+  */
+-const debug = debuglog('avvio')
++const debug = () => {}
+ 
+ module.exports = {
+   debug

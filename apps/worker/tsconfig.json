@@ -1,0 +1,1 @@
+{"compilerOptions":{"target":"ES2022","module":"ESNext","moduleResolution":"Bundler","strict":true,"skipLibCheck":true,"noEmit":true,"esModuleInterop":true,"resolveJsonModule":true,"types":["@cloudflare/workers-types","node"]},"include":["src/**/*.ts","tests/**/*.ts","../api/src/types/**/*.d.ts"]}

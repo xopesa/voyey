@@ -1,0 +1,545 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserStatus {
+  ACTIVE
+  BLOCKED
+  DELETED
+}
+
+enum ProductStatus {
+  DRAFT
+  ACTIVE
+  INACTIVE
+}
+
+enum Currency {
+  UZS
+}
+
+enum OrderStatus {
+  AWAITING_PREPAYMENT
+  PREPAYMENT_SUBMITTED
+  AWAITING_PURCHASE
+  PURCHASED
+  IN_TRANSIT
+  ARRIVED
+  WEIGHING
+  AWAITING_FINAL_PAYMENT
+  FINAL_PAYMENT_SUBMITTED
+  PAID_FULL
+  READY_TO_SHIP
+  SHIPPED
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentType {
+  PREPAYMENT
+  FINAL
+}
+
+enum PaymentStatus {
+  SUBMITTED
+  APPROVED
+  REJECTED
+}
+
+enum PreferredLocale {
+  uz
+  ru
+}
+
+enum TelegramProductPostStatus {
+  PENDING
+  PUBLISHED
+  FAILED
+}
+
+model TelegramProductPost {
+  id String @id @default(cuid())
+  productId String
+  channelChatId String
+  messageId Int?
+  status TelegramProductPostStatus @default(PENDING)
+  attemptId String
+  publishedAt DateTime?
+  lastAttemptAt DateTime
+  lastErrorCode String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+  @@unique([productId, channelChatId])
+}
+
+model User {
+  id              String          @id @default(cuid())
+  telegramId      BigInt          @unique
+  username        String?
+  firstName       String?
+  lastName        String?
+  languageCode    String?
+  preferredLocale PreferredLocale @default(uz)
+  status          UserStatus      @default(ACTIVE)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  auditLogs        AuditLog[] @relation("AuditLogActor")
+  cart             Cart?
+  customerNotes    CustomerNote[]
+  orders           Order[]
+  promoRedemptions PromoCodeRedemption[]
+  reviewedPayments Payment[]  @relation("PaymentReviewer")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  action     String
+  entityType String
+  entityId   String
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  actor User? @relation("AuditLogActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([actorId, createdAt])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
+
+model Category {
+  archivedAt DateTime?
+  archivedBy String?
+  banners Banner[]
+  id        String   @id @default(cuid())
+  nameRu    String
+  nameUz    String
+  slug      String   @unique
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  products Product[]
+
+  @@index([isActive, sortOrder])
+}
+
+model Product {
+  archivedAt DateTime?
+  archivedBy String?
+  banners Banner[]
+  id            String        @id @default(cuid())
+  categoryId    String
+  nameRu        String
+  nameUz        String
+  slug          String        @unique
+  descriptionRu String?
+  descriptionUz String?
+  sourceUrl     String?
+  costPrice     Int?
+  salePrice     Int?
+  saleStartsAt  DateTime?
+  saleEndsAt    DateTime?
+  price         Int
+  currency      Currency      @default(UZS)
+  status        ProductStatus @default(DRAFT)
+  isFeatured    Boolean       @default(false)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  category   Category         @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  images     ProductImage[]
+  telegramPosts TelegramProductPost[]
+  variants   ProductVariant[]
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+
+  @@index([categoryId, status])
+  @@index([status, isFeatured])
+  @@index([status, createdAt, id])
+}
+
+enum BannerTarget {
+  NONE
+  CATALOG
+  CATEGORY
+  PRODUCT
+  URL
+}
+
+model Banner {
+  id String @id @default(cuid())
+  titleRu String
+  titleUz String
+  subtitleRu String?
+  subtitleUz String?
+  buttonRu String?
+  buttonUz String?
+  imageUrl String @default("")
+  storageKey String?
+  targetType BannerTarget @default(NONE)
+  targetCategoryId String?
+  targetProductId String?
+  targetUrl String?
+  sortOrder Int @default(0)
+  isActive Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  targetCategory Category? @relation(fields: [targetCategoryId], references: [id], onDelete: SetNull)
+  targetProduct Product? @relation(fields: [targetProductId], references: [id], onDelete: SetNull)
+  @@index([isActive, sortOrder])
+  @@index([updatedAt])
+}
+
+model ProductImage {
+  id         String   @id @default(cuid())
+  productId  String
+  url        String
+  storageKey String?  @unique
+  sortOrder  Int      @default(0)
+  isPrimary  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([productId, sortOrder])
+  @@index([productId, isPrimary])
+}
+
+model ProductVariant {
+  id        String   @id @default(cuid())
+  productId String
+  sku       String   @unique
+  size      String
+  color     String?
+  stock     Int?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  product    Product     @relation(fields: [productId], references: [id], onDelete: Restrict)
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+
+  @@index([productId, isActive])
+  @@index([productId, size])
+}
+
+model Cart {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items CartItem[]
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  cartId    String
+  productId String
+  variantId String
+  quantity  Int
+  heightCm  Int?
+  weightKg  Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cart    Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product Product        @relation(fields: [productId], references: [id], onDelete: Restrict)
+  variant ProductVariant @relation(fields: [variantId], references: [id], onDelete: Restrict)
+
+  @@unique([cartId, variantId])
+  @@index([productId])
+  @@index([variantId])
+}
+
+enum ExpenseCategory {
+  CARGO
+  PACKAGING
+  DELIVERY
+  ADVERTISING
+  BANK_FEE
+  OTHER
+}
+enum CancellationReason {
+  CUSTOMER_REQUEST
+  OUT_OF_STOCK
+  SUPPLIER_UNAVAILABLE
+  DUPLICATE_ORDER
+  PAYMENT_ISSUE
+  OTHER
+}
+enum StockReleaseStatus {
+  NOT_RELEASED
+  RELEASED
+  REVIEW_REQUIRED
+}
+enum RefundStatus {
+  PENDING
+  COMPLETED
+}
+model Refund {
+  id String @id @default(cuid())
+  orderId String @unique
+  amount Int
+  status RefundStatus @default(PENDING)
+  reference String?
+  note String?
+  createdBy String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  completedAt DateTime?
+  completedBy String?
+  order Order @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  @@index([status, createdAt, id])
+  @@index([completedAt])
+}
+model CustomerRefundNotificationDelivery {
+  id String @id @default(cuid())
+  eventKey String
+  telegramId String
+  eventType String
+  status TelegramDeliveryStatus @default(PENDING)
+  attemptId String
+  telegramMessageId Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  sentAt DateTime?
+  lastErrorCode String?
+  @@unique([eventKey, telegramId])
+}
+model Expense {
+  id String @id @default(cuid())
+  category ExpenseCategory
+  amount Int
+  occurredAt DateTime
+  description String?
+  orderId String?
+  createdBy String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  voidedAt DateTime?
+  voidedBy String?
+  order Order? @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  @@index([occurredAt, id])
+  @@index([category, occurredAt, id])
+  @@index([orderId])
+}
+
+enum OrderSource {
+  MINIAPP
+  ADMIN
+}
+
+model CustomerNote {
+  id String @id @default(cuid())
+  userId String
+  body String
+  createdBy String
+  createdAt DateTime @default(now())
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+  @@index([userId, createdAt, id])
+}
+
+model Order {
+  cancelledAt DateTime?
+  cancelledBy String?
+  cancellationReason CancellationReason?
+  cancellationNote String?
+  stockReleaseStatus StockReleaseStatus @default(NOT_RELEASED)
+  stockReleasedAt DateTime?
+  refund Refund?
+  completedAt DateTime?
+  dashboardHiddenAt DateTime?
+  estimatedWarehouseArrival String?
+  expenses Expense[]
+  source OrderSource @default(MINIAPP)
+  id                 String      @id @default(cuid())
+  publicId           String      @unique
+  userId             String
+  idempotencyKey     String
+  status             OrderStatus @default(AWAITING_PREPAYMENT)
+  fullName           String
+  phone              String
+  city               String
+  address            String
+  apartment          String?
+  comment            String?
+  currency           Currency    @default(UZS)
+  // Canonical pre-promo subtotal. NULL on legacy orders; subtotal keeps the 0001 compatibility CHECK.
+  itemsSubtotal      Int?
+  discountAmount     Int @default(0)
+  promoCodeSnapshot  String?
+  promoRedemption    PromoCodeRedemption?
+  subtotal           Int
+  total              Int
+  requiredPrepayment Int
+  paidAmount         Int         @default(0)
+  remainingAmount    Int
+  cargoAmount        Int?
+  cargoPaidAmount    Int         @default(0)
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+
+  user     User        @relation(fields: [userId], references: [id], onDelete: Restrict)
+  items    OrderItem[]
+  payments Payment[]
+
+  @@unique([userId, idempotencyKey])
+  @@index([userId, createdAt, id])
+  @@index([status, createdAt, id])
+  @@index([completedAt, id])
+  @@index([dashboardHiddenAt, createdAt, id])
+}
+
+model OrderItem {
+  inventoryReservedQuantity Int?
+  procurementUnitCost Int?
+  procurementUpdatedAt DateTime?
+  procurementUpdatedBy String?
+  id            String   @id @default(cuid())
+  orderId       String
+  productId     String?
+  variantId     String?
+  productNameRu String
+  productNameUz String
+  productSlug   String
+  imageUrl      String?
+  sku           String
+  size          String
+  color         String?
+  originalUnitPrice Int?
+  unitPrice     Int
+  quantity      Int
+  lineTotal     Int
+  heightCm      Int?
+  weightKg      Int?
+  createdAt     DateTime @default(now())
+
+  order   Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product?        @relation(fields: [productId], references: [id], onDelete: SetNull)
+  variant ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+  @@index([productId])
+  @@index([variantId])
+}
+
+model Payment {
+  id               String        @id @default(cuid())
+  orderId          String
+  type             PaymentType
+  status           PaymentStatus @default(SUBMITTED)
+  expectedAmount   Int
+  idempotencyKey   String
+  proofStorageKey  String        @unique
+  proofMimeType    String
+  reviewedByUserId String?
+  rejectionReason  String?
+  submittedAt      DateTime      @default(now())
+  reviewedAt       DateTime?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  order      Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  reviewedBy User? @relation("PaymentReviewer", fields: [reviewedByUserId], references: [id], onDelete: SetNull)
+
+  @@unique([orderId, idempotencyKey])
+  @@index([orderId, submittedAt])
+  @@index([status, type, submittedAt])
+}
+
+// Infrastructure only; customer commerce domain models remain unchanged.
+model AdminWebSession {
+  tokenHash String @id
+  csrfToken String
+  expiresAt DateTime
+  @@index([expiresAt])
+}
+
+model AdminLoginRateLimit {
+  key String @id
+  count Int
+  expiresAt DateTime
+  @@index([expiresAt])
+}
+
+model TelegramAdmin {
+  id String @id @default(cuid())
+  telegramId String @unique
+  label String?
+  isActive Boolean @default(true)
+  notifyNewOrders Boolean @default(true)
+  notifyPayments Boolean @default(true)
+  createdBy String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum TelegramDeliveryStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+model TelegramNotificationDelivery {
+  id String @id @default(cuid())
+  eventKey String
+  telegramId String
+  eventType String
+  status TelegramDeliveryStatus @default(PENDING)
+  attemptId String
+  telegramMessageId Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  sentAt DateTime?
+  lastErrorCode String?
+  @@unique([eventKey, telegramId])
+}
+
+enum PromoCodeType {
+  PERCENT
+  FIXED
+}
+model PromoCode {
+  id String @id @default(cuid())
+  code String @unique
+  type PromoCodeType
+  value Int
+  minOrderAmount Int?
+  maxDiscount Int?
+  startsAt DateTime?
+  endsAt DateTime?
+  usageLimit Int?
+  perUserLimit Int @default(1)
+  isActive Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  redemptions PromoCodeRedemption[]
+}
+model PromoCodeRedemption {
+  releasedAt DateTime?
+  releaseReason String?
+  id String @id @default(cuid())
+  promoCodeId String
+  userId String
+  orderId String @unique
+  discountAmount Int
+  createdAt DateTime @default(now())
+  promoCode PromoCode @relation(fields: [promoCodeId], references: [id], onDelete: Restrict)
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+  order Order @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  @@index([promoCodeId])
+  @@index([userId])
+  @@index([createdAt])
+}

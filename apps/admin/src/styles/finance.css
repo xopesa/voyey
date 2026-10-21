@@ -1,0 +1,128 @@
+.finance-section,
+.finance-cost {
+  min-width: 0;
+}
+.finance-items {
+  display: grid;
+  gap: 1rem;
+  margin: 1rem 0 2rem;
+}
+.finance-cost {
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+}
+.finance-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+.finance-section .finance-grid {
+  margin: 1.2rem 0;
+}
+.finance-section dd {
+  overflow-wrap: anywhere;
+}
+.finance-fields {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.finance-table-wrap {
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+.finance-table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.finance-table-wrap th,
+.finance-table-wrap td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+.finance-description {
+  min-width: 10rem;
+  max-width: 25rem;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.finance-filters {
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.finance-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0 2rem;
+}
+.finance-kpis strong {
+  font-size: clamp(1.2rem, 2vw, 1.8rem);
+  overflow-wrap: anywhere;
+}
+.finance-kpis section {
+  padding: 1.3rem;
+  min-width: 0;
+}
+.finance-two {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.finance-chart {
+  padding: 1.3rem;
+  min-width: 0;
+}
+.finance-chart svg {
+  width: 100%;
+  height: auto;
+}
+.finance-chart input[type="range"] {
+  width: 100%;
+  accent-color: var(--dashboard-accent);
+}
+.finance-breakdown {
+  display: grid;
+  gap: 1rem;
+}
+.finance-breakdown div {
+  display: grid;
+  grid-template-columns: minmax(7rem, 1fr) 1fr;
+  gap: 0.5rem;
+}
+.finance-breakdown dd {
+  text-align: right;
+  margin: 0;
+}
+.finance-breakdown meter {
+  grid-column: 1/-1;
+  width: 100%;
+  accent-color: var(--dashboard-accent);
+}
+.finance-incomplete-list {
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 1rem;
+}
+.finance-incomplete-list li {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  border-bottom: 1px solid var(--border);
+  padding: 0.7rem 0;
+}
+@media (max-width: 900px) {
+  .finance-two {
+    grid-template-columns: 1fr;
+  }
+}
