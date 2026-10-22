@@ -49,7 +49,7 @@ const checkoutCartInclude = {
     include: {
       product: {
         include: {
-          category: { select: { isActive: true, archivedAt: true } },
+          category: true,
           images: {
             orderBy: [
               { isPrimary: "desc" as const },

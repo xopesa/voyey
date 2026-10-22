@@ -16,6 +16,7 @@ import type {
 
 function toCategoryDto(category: CatalogCategoryRecord): CategoryDto {
   return {
+    requiresBuyerMeasurements: category.requiresBuyerMeasurements !== false,
     attributeDefinitions: normalizeCatalogAttributeDefinitions(
       category.attributeDefinitions,
     ),

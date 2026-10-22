@@ -66,6 +66,7 @@ const httpUrlSchema = z
 
 export const categoryCreateSchema = z
   .object({
+    requiresBuyerMeasurements: z.boolean().default(true),
     attributeDefinitions: attributeDefinitionsSchema.default([]),
     nameRu: localizedNameSchema,
     nameUz: localizedNameSchema,
@@ -77,6 +78,7 @@ export const categoryCreateSchema = z
 
 export const categoryPatchSchema = z
   .object({
+    requiresBuyerMeasurements: z.boolean().optional(),
     attributeDefinitions: attributeDefinitionsSchema.optional(),
     nameRu: localizedNameSchema.optional(),
     nameUz: localizedNameSchema.optional(),

@@ -5,6 +5,7 @@ import type {
 } from "@stenzo/shared";
 
 export interface CatalogCategoryRecord {
+  requiresBuyerMeasurements?: boolean;
   /** Raw JSON from repositories; absent on legacy fixtures. */
   attributeDefinitions?: unknown;
   archivedAt?: Date | null;
@@ -80,6 +81,7 @@ export interface CatalogProductListResult {
 }
 
 export interface CategoryDto {
+  requiresBuyerMeasurements: boolean;
   attributeDefinitions: CatalogAttributeDefinition[];
   id: string;
   nameRu: string;

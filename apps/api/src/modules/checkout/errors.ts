@@ -1,7 +1,7 @@
 export class CheckoutMeasurementsError extends Error {
   public constructor() {
     super(
-      "Every cart item requires height (100–250 cm) and weight (30–300 kg)",
+      "Buyer sizing requires height (100–250 cm) and weight (30–300 kg) when enabled; optional measurements must use the same ranges",
     );
     this.name = "CheckoutMeasurementsError";
   }

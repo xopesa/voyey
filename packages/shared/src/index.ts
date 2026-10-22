@@ -1,6 +1,7 @@
 export type UserStatusValue = "ACTIVE" | "BLOCKED" | "DELETED";
 export * from "./sale-availability.js";
 export * from "./catalog-attributes.js";
+export * from "./catalog-order-snapshot.js";
 export * from "./telegram-product.js";
 export * from "./telegram-admin.js";
 export * from "./telegram-payment.js";

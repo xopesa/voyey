@@ -1,9 +1,16 @@
 export interface CartCategoryRecord {
+  id?: string;
+  nameRu?: string;
+  nameUz?: string;
+  slug?: string;
+  requiresBuyerMeasurements?: boolean;
+  attributeDefinitions?: unknown;
   archivedAt?: Date | null;
   isActive: boolean;
 }
 
 export interface CartProductRecord {
+  attributes?: unknown;
   /** Internal only; the public Cart DTO deliberately omits this field. */
   costPrice?: number | null;
   archivedAt?: Date | null;
@@ -22,6 +29,7 @@ export interface CartProductRecord {
 }
 
 export interface CartVariantRecord {
+  attributes?: unknown;
   id: string;
   productId: string;
   sku: string;

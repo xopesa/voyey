@@ -299,6 +299,14 @@ export const models = {
   },
   Category: {
     fields: {
+      requiresBuyerMeasurements: {
+        type: "Boolean",
+        optional: false,
+        id: false,
+        unique: false,
+        updated: false,
+        default: true,
+      },
       attributeDefinitions: {
         type: "Json",
         optional: false,
@@ -1793,6 +1801,13 @@ export const models = {
   },
   OrderItem: {
     fields: {
+      catalogSnapshot: {
+        type: "Json",
+        optional: true,
+        id: false,
+        unique: false,
+        updated: false,
+      },
       inventoryReservedQuantity: {
         type: "Int",
         optional: true,

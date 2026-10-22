@@ -32,15 +32,7 @@ export const manualOrderSchema = z
   .object({
     userId: z.string().min(1).max(100),
     recipient: recipientSchema,
-    items: z
-      .array(
-        addCartItemSchema.extend({
-          heightCm: z.number().int().min(100).max(250),
-          weightKg: z.number().int().min(30).max(300),
-        }),
-      )
-      .min(1)
-      .max(20),
+    items: z.array(addCartItemSchema).min(1).max(20),
     promoCode: z.string().trim().min(3).max(32).optional(),
   })
   .strict();

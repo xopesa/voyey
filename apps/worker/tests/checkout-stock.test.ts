@@ -335,6 +335,19 @@ test("checkout uses current price and preserves all order item snapshots after c
   assert.equal(created.requiredPrepayment, 210001);
   assert.deepEqual(created.items, [
     {
+      catalogSnapshot: {
+        version: 1,
+        category: {
+          id: "stock-category",
+          nameRu: "Test",
+          nameUz: "Sinov",
+          slug: "stock-category",
+        },
+        requiresBuyerMeasurements: true,
+        attributeDefinitions: [],
+        productAttributes: {},
+        variantAttributes: {},
+      },
       productId: id,
       variantId: variant,
       productNameRu: "Current RU",

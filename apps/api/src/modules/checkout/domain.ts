@@ -1,4 +1,7 @@
-import { effectiveProductPrice } from "@stenzo/shared";
+import {
+  effectiveProductPrice,
+  createCatalogOrderItemSnapshot,
+} from "@stenzo/shared";
 import { randomBytes } from "node:crypto";
 
 import { assertPurchasable } from "../cart/domain.js";
@@ -40,15 +43,18 @@ export function prepareOrderItems(
 ): PreparedOrder {
   if (cartItems.length === 0) throw new CheckoutEmptyCartError();
   const items = cartItems.map((item) => {
+    const required = item.product.category.requiresBuyerMeasurements !== false;
+    const validMeasurement = (
+      value: number | null | undefined,
+      min: number,
+      max: number,
+    ) =>
+      value != null && Number.isInteger(value) && value >= min && value <= max;
     if (
-      item.heightCm === null ||
-      !Number.isInteger(item.heightCm) ||
-      item.heightCm < 100 ||
-      item.heightCm > 250 ||
-      item.weightKg === null ||
-      !Number.isInteger(item.weightKg) ||
-      item.weightKg < 30 ||
-      item.weightKg > 300
+      ((required || item.heightCm != null) &&
+        !validMeasurement(item.heightCm, 100, 250)) ||
+      ((required || item.weightKg != null) &&
+        !validMeasurement(item.weightKg, 30, 300))
     )
       throw new CheckoutMeasurementsError();
     assertPurchasable(
@@ -63,6 +69,11 @@ export function prepareOrderItems(
       throw new CheckoutAmountLimitError();
     }
     return {
+      catalogSnapshot: createCatalogOrderItemSnapshot(
+        item.product.category,
+        item.product.attributes,
+        item.variant.attributes,
+      ),
       productId: item.productId,
       variantId: item.variantId,
       productNameRu: item.product.nameRu,
@@ -76,8 +87,8 @@ export function prepareOrderItems(
       unitPrice,
       quantity: item.quantity,
       lineTotal,
-      heightCm: item.heightCm,
-      weightKg: item.weightKg,
+      heightCm: item.heightCm ?? null,
+      weightKg: item.weightKg ?? null,
     };
   });
   const subtotal = items.reduce((sum, item) => sum + item.lineTotal, 0);

@@ -21,6 +21,7 @@ export type AdminVariantRecord = CatalogVariantRecord;
 export type ProductStatusValue = "DRAFT" | "ACTIVE" | "INACTIVE";
 
 export interface CategoryCreateInput {
+  requiresBuyerMeasurements?: boolean;
   attributeDefinitions?: CatalogAttributeDefinition[];
   nameRu: string;
   nameUz: string;
@@ -30,6 +31,7 @@ export interface CategoryCreateInput {
 }
 
 export interface CategoryPatchInput {
+  requiresBuyerMeasurements?: boolean;
   attributeDefinitions?: CatalogAttributeDefinition[];
   nameRu?: string;
   nameUz?: string;

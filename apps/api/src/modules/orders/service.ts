@@ -1,4 +1,5 @@
 import { OrderNotFoundError } from "./errors.js";
+import { readCatalogOrderItemSnapshot } from "@stenzo/shared";
 import { currentPaymentPhase, nextAdminStatus } from "./status-policy.js";
 import type { OrderRepository } from "./repository.js";
 import type {
@@ -50,6 +51,7 @@ export function toOrderDto(order: OrderRecord): OrderDto {
       comment: order.comment,
     },
     items: order.items.map((item) => ({
+      catalogSnapshot: readCatalogOrderItemSnapshot(item.catalogSnapshot),
       productId: item.productId,
       variantId: item.variantId,
       productNameRu: item.productNameRu,

@@ -115,6 +115,7 @@ model AuditLog {
 }
 
 model Category {
+  requiresBuyerMeasurements Boolean @default(true)
   attributeDefinitions Json @default("[]")
   archivedAt DateTime?
   archivedBy String?
@@ -409,6 +410,7 @@ model Order {
 }
 
 model OrderItem {
+  catalogSnapshot Json?
   inventoryReservedQuantity Int?
   procurementUnitCost Int?
   procurementUpdatedAt DateTime?

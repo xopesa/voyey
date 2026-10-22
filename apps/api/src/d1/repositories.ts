@@ -640,7 +640,10 @@ export class D1AdminCatalogRepository extends PrismaAdminCatalogRepository {
         ...input,
         attributeDefinitions: definitions,
       });
-      audit(b, actor, "category.create", "Category", id, { slug: input.slug });
+      audit(b, actor, "category.create", "Category", id, {
+        slug: input.slug,
+        requiresBuyerMeasurements: input.requiresBuyerMeasurements ?? true,
+      });
       return id;
     });
     return prisma.category.findUniqueOrThrow({ where: { id } });
@@ -671,6 +674,9 @@ export class D1AdminCatalogRepository extends PrismaAdminCatalogRepository {
       });
       audit(b, actor, "category.update", "Category", id, {
         slug: input.slug ?? current.slug,
+        ...(input.requiresBuyerMeasurements === undefined
+          ? {}
+          : { requiresBuyerMeasurements: input.requiresBuyerMeasurements }),
         ...(definitions === undefined
           ? {}
           : { attributeKeys: definitions.map((d) => d.key) }),

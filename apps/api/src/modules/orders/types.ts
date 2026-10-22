@@ -1,3 +1,5 @@
+import type { CatalogOrderItemSnapshot } from "@stenzo/shared";
+
 export type OrderStatusValue =
   | "AWAITING_PREPAYMENT"
   | "PREPAYMENT_SUBMITTED"
@@ -37,6 +39,7 @@ export interface RecipientInput {
 }
 
 export interface OrderItemRecord {
+  catalogSnapshot?: unknown;
   product?: { sourceUrl: string | null } | null;
   id: string;
   orderId: string;
@@ -113,7 +116,12 @@ export interface PreparedOrder {
   remainingAmount: number;
   cargoAmount: number | null;
   cargoPaidAmount: number;
-  items: Array<Omit<OrderItemRecord, "id" | "orderId" | "createdAt">>;
+  items: Array<
+    Omit<
+      OrderItemRecord,
+      "id" | "orderId" | "createdAt" | "catalogSnapshot"
+    > & { catalogSnapshot: CatalogOrderItemSnapshot }
+  >;
 }
 
 export interface OrderListQuery {
@@ -141,7 +149,10 @@ export interface OrderDto {
   status: OrderStatusValue;
   recipient: RecipientInput;
   items: Array<
-    Omit<OrderItemRecord, "id" | "orderId" | "createdAt" | "product">
+    Omit<
+      OrderItemRecord,
+      "id" | "orderId" | "createdAt" | "product" | "catalogSnapshot"
+    > & { catalogSnapshot: CatalogOrderItemSnapshot | null }
   >;
   currency: "UZS";
   itemsSubtotal?: number | null;
