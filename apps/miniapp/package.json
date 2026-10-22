@@ -8,12 +8,12 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "vite build",
-    "start": "node ../../scripts/start-next.mjs miniapp",
+    "start": "node ../../scripts/blocked-remote.mjs",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "node --test tests/*.test.mjs",
     "build:next": "next build",
-    "dev:next": "next dev --port 3000"
+    "dev:next": "node ../../scripts/blocked-remote.mjs"
   },
   "dependencies": {
     "@stenzo/shared": "workspace:*",

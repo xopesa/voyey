@@ -108,7 +108,7 @@ for (const [app, port] of [
         "utf8",
       ),
     );
-    assert.equal(manifest.scripts.start, "node server.js");
+    assert.equal(manifest.scripts.start, "node ../../../scripts/blocked-remote.mjs");
     assert.equal(manifest.type, "commonjs");
     assert.equal(manifest.private, true);
     assert.equal(manifest.engines.node, "24.x");

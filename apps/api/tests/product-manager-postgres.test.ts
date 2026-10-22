@@ -104,7 +104,7 @@ it.skipIf(process.env.STENZO_TEST_POSTGRES !== "1")(
         method: "POST",
         url: "/admin/auth/login",
         headers: { origin, "x-stenzo-admin": "1" },
-        payload: { login: "odilbek_admin", password },
+        payload: { login: "voyey_admin", password },
       });
       expect(login.statusCode).toBe(200);
       const headers = {
@@ -404,7 +404,7 @@ it.skipIf(process.env.STENZO_TEST_POSTGRES !== "1")(
               actorId: null,
               metadata: {
                 authType: "web-admin",
-                adminPrincipal: "odilbek_admin",
+                adminPrincipal: "voyey_admin",
               },
             });
             expect(

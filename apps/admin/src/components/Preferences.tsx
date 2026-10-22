@@ -17,15 +17,15 @@ const PreferencesContext = createContext<{
   setTheme: (value: Theme) => void;
   t: (key: MessageKey) => string;
 } | null>(null);
-export const preferenceScript = `try{var l=localStorage.getItem('stenzo.locale'),t=localStorage.getItem('stenzo.theme');document.documentElement.lang=l==='uz'?'uz':'ru';document.documentElement.dataset.theme=t==='light'||t==='dark'?t:matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}catch{}`;
+export const preferenceScript = `try{var l=localStorage.getItem('voyey.locale'),t=localStorage.getItem('voyey.theme');document.documentElement.lang=l==='uz'?'uz':'ru';document.documentElement.dataset.theme=t==='light'||t==='dark'?t:matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}catch{}`;
 
 export function Preferences({ children }: { children: ReactNode }) {
   const [locale, setLocale] = useState<Locale>("ru");
   const [theme, setTheme] = useState<Theme>("system");
   useEffect(() => {
     try {
-      setLocale(localStorage.getItem("stenzo.locale") === "uz" ? "uz" : "ru");
-      const saved = localStorage.getItem("stenzo.theme");
+      setLocale(localStorage.getItem("voyey.locale") === "uz" ? "uz" : "ru");
+      const saved = localStorage.getItem("voyey.theme");
       setTheme(saved === "dark" || saved === "light" ? saved : "system");
     } catch {
       /* Preferences remain available in memory. */
@@ -55,11 +55,11 @@ export function Preferences({ children }: { children: ReactNode }) {
         locale,
         theme,
         setLocale: (value) => {
-          persist("stenzo.locale", value);
+          persist("voyey.locale", value);
           setLocale(value);
         },
         setTheme: (value) => {
-          persist("stenzo.theme", value);
+          persist("voyey.theme", value);
           setTheme(value);
         },
         t: (key) => messages[locale][key],

@@ -2,8 +2,8 @@ import { jwtVerify, SignJWT } from "jose";
 
 import { InvalidTokenError } from "./errors.js";
 
-const JWT_ISSUER = "stenzo-api";
-const JWT_AUDIENCE = "stenzo-miniapp";
+const JWT_ISSUER = "voyey-api";
+const JWT_AUDIENCE = "voyey-miniapp";
 
 export class JwtTokenService {
   private readonly secretKey: Uint8Array;

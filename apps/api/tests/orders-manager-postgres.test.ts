@@ -156,7 +156,7 @@ it.skipIf(process.env.STENZO_TEST_POSTGRES !== "1")(
         method: "POST",
         url: "/admin/auth/login",
         headers: { origin, "x-stenzo-admin": "1" },
-        payload: { login: "odilbek_admin", password },
+        payload: { login: "voyey_admin", password },
       });
       expect(login.statusCode).toBe(200);
       bootstrapCookie = String(login.headers["set-cookie"]);
@@ -613,7 +613,7 @@ it.skipIf(process.env.STENZO_TEST_POSTGRES !== "1")(
             expect(audit).toMatchObject({
               actorId: null,
               metadata: {
-                adminPrincipal: "odilbek_admin",
+                adminPrincipal: "voyey_admin",
                 authType: "web-admin",
               },
             });

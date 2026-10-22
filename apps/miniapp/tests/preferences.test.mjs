@@ -84,14 +84,14 @@ test("locale defaults to UZ, and all uz language tags choose Uzbek Latin", () =>
 test("saved locale wins over Telegram and invalid saved values are ignored", () => {
   assert.equal(
     environment({
-      saved: { "stenzo.locale": "ru" },
+      saved: { "voyey.locale": "ru" },
       telegram: { initDataUnsafe: { user: { language_code: "uz" } } },
     }).read().locale,
     "ru",
   );
   assert.equal(
     environment({
-      saved: { "stenzo.locale": "invalid", "stenzo.theme": "invalid" },
+      saved: { "voyey.locale": "invalid", "voyey.theme": "invalid" },
     }).read().themeMode,
     "system",
   );
@@ -123,7 +123,7 @@ test("system uses Telegram first, then device, ignoring the ordinary-browser SDK
 
 test("explicit choices win over Telegram and device theme changes", () => {
   const env = environment({
-    saved: { "stenzo.theme": "dark" },
+    saved: { "voyey.theme": "dark" },
     telegram: { colorScheme: "light", platform: "android" },
   });
   assert.equal(env.read().resolvedTheme, "dark");
@@ -136,7 +136,7 @@ test("explicit choices win over Telegram and device theme changes", () => {
 
 test("storage errors preserve working in-memory settings", () => {
   const env = environment({ blocked: true });
-  assert.doesNotThrow(() => env.module.savePreference("stenzo.theme", "dark"));
+  assert.doesNotThrow(() => env.module.savePreference("voyey.theme", "dark"));
   assert.equal(
     env.read({ locale: "uz", themeMode: "dark" }).resolvedTheme,
     "dark",
@@ -146,7 +146,7 @@ test("storage errors preserve working in-memory settings", () => {
 
 test("inline initialization applies saved preferences before hydration", () => {
   const env = environment({
-    saved: { "stenzo.locale": "uz", "stenzo.theme": "dark" },
+    saved: { "voyey.locale": "uz", "voyey.theme": "dark" },
   });
   runInNewContext(env.module.preferenceScript, {
     window: env.window,

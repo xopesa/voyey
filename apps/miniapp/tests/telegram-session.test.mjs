@@ -157,6 +157,23 @@ test("blocked sessionStorage is safe and cannot create a token outside Telegram"
   assert.doesNotThrow(() => storage.clearAccessToken());
   assert.doesNotThrow(() => storage.storeAccessToken("synthetic-test-only"));
 });
+test("VOYEY storage never reads or overwrites the old STENZO access token", () => {
+  const values = new Map([["stenzo.access-token", "legacy-synthetic"]]);
+  const storage = load("lib/auth-storage.ts", {
+    window: {
+      sessionStorage: {
+        getItem: (key) => values.get(key) ?? null,
+        setItem: (key, value) => values.set(key, value),
+        removeItem: (key) => values.delete(key),
+      },
+    },
+  });
+  assert.equal(storage.readAccessToken(), null);
+  storage.storeAccessToken("voyey-synthetic");
+  assert.equal(storage.readAccessToken(), "voyey-synthetic");
+  storage.clearAccessToken();
+  assert.equal(values.get("stenzo.access-token"), "legacy-synthetic");
+});
 const i18n = load("lib/i18n.ts");
 function render(state, locale) {
   const dependencies = {

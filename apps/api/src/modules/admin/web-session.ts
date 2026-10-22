@@ -7,12 +7,12 @@ import {
   type AdminSessionStore,
 } from "./session-store.js";
 
-export const ADMIN_LOGIN = "odilbek_admin";
+export const ADMIN_LOGIN = "voyey_admin";
 export const WEB_ADMIN_ACTOR = `web-admin:${ADMIN_LOGIN}`;
 export const SESSION_SECONDS = 8 * 60 * 60;
-export const COOKIE_NAME = "stenzo_admin_session";
+export const COOKIE_NAME = "voyey_admin_session";
 const digest = (value: string) =>
-  createHash("sha256").update(value).digest("hex");
+  createHash("sha256").update("voyey:admin:").update(value).digest("hex");
 
 export class WebAdminSessions {
   constructor(

@@ -3,11 +3,11 @@ import { cookies } from "next/headers";
 import { apiUrl } from "./server-api";
 
 export async function getSession() {
-  const token = (await cookies()).get("stenzo_admin_session")?.value;
+  const token = (await cookies()).get("voyey_admin_session")?.value;
   if (!token) return null;
   try {
     const response = await fetch(apiUrl("auth/session"), {
-      headers: { cookie: `stenzo_admin_session=${encodeURIComponent(token)}` },
+      headers: { cookie: `voyey_admin_session=${encodeURIComponent(token)}` },
       cache: "no-store",
       signal: AbortSignal.timeout(5000),
     });

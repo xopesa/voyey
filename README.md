@@ -1,52 +1,47 @@
-# STENZO Cloudflare Free
+# VOYEY: локальная техническая конфигурация
 
-Independent Workers + D1 adaptation of STENZO Wear. No Docker or Containers.
-Live preview: https://cf.stenzo.uz. See [deployment status](docs/DEPLOYMENT_STATUS.md)
-for the verified Access Admin login, disabled commerce and remaining prerequisites.
-The original Desktop/Stenzo checkout and Turon production are separate and are
-never deployment targets of this repository.
+Этап 1.1 отделяет инфраструктуру VOYEY от STENZO. Публичный брендинг STENZO,
+логотип, палитра и интерфейс намеренно сохранены. Рабочая архитектура:
+React SPA Admin/Mini App → Cloudflare Worker → Fastify → D1.
+Изображения товаров и приватные чеки остаются в раздельных пространствах D1.
 
-[Stage 0 stabilization](docs/TECHNICAL_STABILIZATION.md) separates Telegram auth
-from disabled commerce. The checked code is deployed to the isolated preview;
-the owner confirmed an active session after launching the Mini App in Telegram.
-The bot token is stored only as a Worker secret, never in this repository.
+Текущая конфигурация **не является развёрнутым VOYEY**. Cloudflare account/D1 ID —
+нулевые заглушки; маршрутов и R2 bindings нет. Домены `*.voyey.example.invalid`
+зарезервированы для шаблонов. `COMMERCE_ENABLED=0`, `VOYEY_LOCAL_ONLY=1`.
+Реальные Telegram, Access и платёжные credentials отсутствуют и отключены.
 
-[B1 client bot and language sync](docs/TELEGRAM_B1.md) adds a separate D1
-`preferredLocale` (UZ by default), bot language selection and authenticated Mini
-App preference sync. Its Worker/migration and preview webhook are deployed; the
-owner confirmed the live bot → Mini App → bot RU/UZ round trip. Commerce remains disabled.
-
-[B2 channel publishing](docs/TELEGRAM_B2.md) adds idempotent UZ photo posts after
-product activation, Admin publication status/retry and safe product deep links.
-Live posting remains blocked until Main Mini App and channel settings are ready
-and the target channel is explicitly confirmed. No real channel post is made by tests.
-
-The existing Mini App and Admin React interfaces build into static assets. A
-Worker runs the Fastify API using Cloudflare's Node HTTP bridge. Commerce uses
-D1 atomic batches and durable sessions. Product images and private payment proofs
-use separate namespaces in chunked D1 storage. Admin uses Cloudflare Access email
-login on its own hostname; no native password module runs in Workers.
-
-Use Node 24 and pnpm 10.17.1:
+Используются Node 24 и pnpm 10.17.1:
 
 ```powershell
 corepack pnpm install --frozen-lockfile
 corepack pnpm db:generate
+corepack pnpm --filter @stenzo/database db:validate
+corepack pnpm config:check
 corepack pnpm build
 corepack pnpm typecheck
 corepack pnpm lint
 corepack pnpm test
-corepack pnpm --filter @stenzo/worker exec wrangler d1 migrations apply DB --local
-corepack pnpm --filter @stenzo/worker dev
 ```
 
-Read [Workers deployment guide](docs/DEPLOY_WORKERS_FREE.md) and
-[source provenance](SOURCE_COPY.md). The default configuration is an empty,
-commerce-disabled preview. No production data or secret values are included.
-Configure a new D1 database and secure Admin integration before deployment.
-Actual free-tier CPU consumption must be verified after deployment.
+`db:generate`/`db:validate` только генерируют типы и проверяют Prisma schema с
+синтаксическим localhost URL; к базе они не подключаются. Тесты D1 создают
+одноразовые локальные схемы и используют поддельные внешние сервисы.
+Исторические PostgreSQL integration tests отключены.
 
-`deploy/turon`, `deploy/cloudflare`, PostgreSQL migrations, Docker files and older
-deployment documents are historical references. The old Container workspace is
-excluded from the active pnpm workspace. Do not execute its deployment commands.
-Do not use PostgreSQL migrations or seed commands for this Worker.
+`corepack pnpm dev` запускает только локальный Worker на 127.0.0.1. Для SPA нужен
+предварительный build. Базу для ручной работы на этом этапе не инициализировали;
+каталог, Admin login и Telegram пока не готовы к полноценному ручному запуску.
+Не копируйте `.env`/`.dev.vars` из STENZO: preflight отклоняет runtime env-файлы.
+`.env.example` — проверяемый неактивный перечень будущих настроек.
+
+`deploy`, запись Cloudflare secrets, проверка реального бота, регистрация webhook,
+legacy Node/Next/Turon start-команды заблокированы. Worker build использует только
+`wrangler deploy --dry-run`; это локальная упаковка без публикации. Любые дополнительные
+аргументы, remote flags, alternate config и env overrides runner отклоняет.
+
+[Описание изоляции и ограничений](docs/VOYEY_INFRASTRUCTURE_ISOLATION.md).
+Файлы `docs/DEPLOYMENT_STATUS.md`, `docs/DEPLOY_WORKERS_FREE.md`, `SOURCE_COPY.md`
+и остальные прежние отчёты описывают историю STENZO. Упомянутые в них сайты,
+ресурсы и команды deployment не являются инфраструктурой или инструкцией запуска VOYEY.
+Исходный snapshot-manifest сохранён как неизменяемый исторический манифест;
+он не описывает намеренные изменения рабочего дерева после этапа 1.1.

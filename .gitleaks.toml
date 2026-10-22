@@ -1,0 +1,9 @@
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Generated dependencies and local verification artifacts"
+paths = [
+  '''(?i)(^|[/\\])(node_modules|\.git|\.cache|\.turbo|\.wrangler|dist|coverage)([/\\]|$)''',
+  '''apps[/\\]worker[/\\]public[/\\]'''
+]

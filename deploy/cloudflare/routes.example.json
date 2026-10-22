@@ -1,18 +1,18 @@
 [
   {
-    "pattern": "cf.stenzo.uz",
+    "pattern": "store.voyey.example.invalid",
     "custom_domain": true
   },
   {
-    "pattern": "cf-api.stenzo.uz",
+    "pattern": "api.voyey.example.invalid",
     "custom_domain": true
   },
   {
-    "pattern": "cf-admin.stenzo.uz",
+    "pattern": "admin.voyey.example.invalid",
     "custom_domain": true
   },
   {
-    "pattern": "cf-bot.stenzo.uz",
+    "pattern": "bot.voyey.example.invalid",
     "custom_domain": true
   }
 ]

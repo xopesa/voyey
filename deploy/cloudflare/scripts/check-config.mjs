@@ -20,7 +20,7 @@ const validate = new Ajv({
 if (!validate(config)) throw new Error(JSON.stringify(validate.errors));
 assert.equal(config.workers_dev, false);
 assert.equal(config.preview_urls, false);
-assert.equal(config.account_id, undefined);
+assert.equal(config.account_id, "0".repeat(32));
 assert.equal(config.routes, undefined);
 assert.equal(config.hyperdrive, undefined);
 assert.equal(config.containers.length, 4);
@@ -37,7 +37,7 @@ assert.ok(
   Object.values(config.vars).every((value) => !value.includes("stenzo.uz")),
 );
 console.log(
-  "Wrangler schema/config: OK; no account, routes, live domains or database bindings.",
+  "Wrangler schema/config: OK; inactive account placeholder, no routes, live domains or database bindings.",
 );
 
 // The preview example must never target the existing production hostnames.
@@ -45,10 +45,10 @@ const previewRoutes = JSON.parse(
   readFileSync(new URL("../routes.example.json", import.meta.url), "utf8"),
 );
 const isolatedHosts = new Set([
-  "cf.stenzo.uz",
-  "cf-api.stenzo.uz",
-  "cf-admin.stenzo.uz",
-  "cf-bot.stenzo.uz",
+  "store.voyey.example.invalid",
+  "api.voyey.example.invalid",
+  "admin.voyey.example.invalid",
+  "bot.voyey.example.invalid",
 ]);
 assert.equal(previewRoutes.length, isolatedHosts.size);
 assert.equal(

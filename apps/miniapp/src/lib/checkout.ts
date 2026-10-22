@@ -156,7 +156,7 @@ export interface AttemptStore {
   write(attempt: CheckoutAttempt): void;
   clear(): void;
 }
-const storageKey = "stenzo.checkout-attempt";
+const storageKey = "voyey.checkout-attempt";
 // Only a cart-scoped random key and optional public promo code are stored.
 // Recipient data and JWT are never persisted here.
 export const checkoutAttemptStore: AttemptStore = {

@@ -9,8 +9,8 @@ export type Preferences = {
 };
 
 export const preferenceKeys = {
-  locale: "stenzo.locale",
-  themeMode: "stenzo.theme",
+  locale: "voyey.locale",
+  themeMode: "voyey.theme",
 } as const;
 export const serverPreferences: Preferences = {
   locale: "uz",

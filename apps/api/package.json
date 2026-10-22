@@ -7,13 +7,13 @@
   },
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
+    "dev": "node ../../scripts/blocked-remote.mjs",
     "build": "tsc -p tsconfig.build.json",
-    "start": "node dist/server.js",
+    "start": "node ../../scripts/blocked-remote.mjs",
     "lint": "eslint src tests scripts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "admin:password": "tsx scripts/set-admin-password.ts"
+    "admin:password": "node ../../scripts/blocked-remote.mjs"
   },
   "dependencies": {
     "@fastify/cookie": "11.0.2",

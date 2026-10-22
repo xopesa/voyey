@@ -1,6 +1,7 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "stenzo-containers-preview",
+  "name": "voyey-containers-inactive",
+  "account_id": "00000000000000000000000000000000",
   "main": "src/index.ts",
   "compatibility_date": "2026-10-15",
   "compatibility_flags": ["nodejs_compat"],

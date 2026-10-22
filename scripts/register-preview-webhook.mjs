@@ -1,11 +1,11 @@
 import { pathToFileURL } from "node:url";
 
-const previewUrl = "https://cf.stenzo.uz/telegram/webhook";
+const previewUrl = "https://store.voyey.example.invalid/telegram/webhook";
 export async function registerPreviewWebhook({
   token,
   secret,
   username,
-  fetcher = fetch,
+  fetcher,
 }) {
   if (
     !/^[0-9]+:[A-Za-z0-9_-]+$/.test(token) ||
@@ -14,6 +14,10 @@ export async function registerPreviewWebhook({
     throw new Error("Invalid preview credentials");
   if (!/^[A-Za-z0-9_]{5,32}$/.test(username))
     throw new Error("Provide the dedicated preview bot username");
+  if (typeof fetcher !== "function")
+    throw new Error(
+      "Remote webhook registration is disabled; only an injected test transport is allowed",
+    );
   const call = async (method, body = {}) => {
     try {
       const response = await fetcher(
@@ -43,7 +47,7 @@ export async function registerPreviewWebhook({
   const menu = await call("getChatMenuButton");
   if (
     menu.type === "web_app" &&
-    new URL(menu.web_app.url).origin !== "https://cf.stenzo.uz"
+    new URL(menu.web_app.url).origin !== "https://store.voyey.example.invalid"
   )
     throw new Error("Refusing a bot whose menu points outside this preview");
   // An update with no sender/message creates no User and sends no chat message.
@@ -79,72 +83,10 @@ export async function registerPreviewWebhook({
   return { bot: bot.username, url: previewUrl, registered: true };
 }
 
-// Masked TTY input only: credentials never become argv, shell history or files.
-async function privatePrompt(label) {
-  if (!process.stdin.isTTY || !process.stdin.setRawMode)
-    throw new Error("Run this command in an interactive terminal");
-  process.stdout.write(label);
-  return new Promise((resolve, reject) => {
-    let value = "";
-    process.stdin.setRawMode(true);
-    process.stdin.setEncoding("utf8");
-    process.stdin.resume();
-    const finish = () => {
-      process.stdin.off("data", onData);
-      process.stdin.setRawMode(false);
-      process.stdin.pause();
-      process.stdout.write("\n");
-    };
-    const onData = (chunk) => {
-      for (const character of chunk) {
-        if (character === "\u0003") {
-          finish();
-          reject(new Error("Cancelled"));
-          return;
-        }
-        if (character === "\r" || character === "\n") {
-          finish();
-          resolve(value);
-          return;
-        }
-        if (character === "\u007f" || character === "\b") {
-          value = value.slice(0, -1);
-          continue;
-        }
-        if (/^[\x20-\x7e]$/.test(character)) value += character;
-      }
-    };
-    process.stdin.on("data", onData);
-  });
-}
-
+// CLI is deliberately disabled before reading credentials or making any request.
 if (
   process.argv[1] &&
   import.meta.url === pathToFileURL(process.argv[1]).href
 ) {
-  try {
-    const username = process.argv[2]?.replace(/^@/, "");
-    if (!username)
-      throw new Error(
-        "Usage: node scripts/register-preview-webhook.mjs PREVIEW_BOT_USERNAME",
-      );
-    const token = await privatePrompt("Dedicated preview bot token (hidden): ");
-    const secret = await privatePrompt(
-      "Same TELEGRAM_WEBHOOK_SECRET as Wrangler (hidden): ",
-    );
-    console.log(
-      JSON.stringify(await registerPreviewWebhook({ token, secret, username })),
-    );
-  } catch (error) {
-    // Only messages explicitly authored above; raw network/provider errors never escape.
-    console.error(
-      error instanceof Error &&
-        /^(Invalid preview credentials|Provide the dedicated|Bot identity|Refusing|Preview webhook|Telegram request|Run this command|Cancelled|Usage:)/.test(
-          error.message,
-        )
-        ? error.message
-        : "Preview webhook setup failed; credentials are hidden",
-    );
-    process.exitCode = 1;
-  }
+  await import("./blocked-remote.mjs");
 }

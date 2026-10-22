@@ -255,7 +255,7 @@ test("preview configuration and runtime retain commerce=0; no order/payment fixt
   const config = JSON.parse(
     readFileSync(new URL("../wrangler.jsonc", import.meta.url), "utf8"),
   );
-  assert.equal(config.name, "stenzo-free-preview");
+  assert.equal(config.name, "voyey-local");
   assert.equal(config.vars.COMMERCE_ENABLED, "0");
   const health = await mf.dispatchFetch("https://preview.invalid/health");
   assert.equal(

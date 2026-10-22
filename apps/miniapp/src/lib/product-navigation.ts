@@ -14,7 +14,7 @@ export function productHref(slug: string, from = "/catalog") {
   return `/catalog/${encodeURIComponent(slug)}?from=${encodeURIComponent(productReturnHref(from))}`;
 }
 
-const key = "stenzo.product-return";
+const key = "voyey.product-return";
 export function rememberProductReturn(slug: string, href: string) {
   try {
     sessionStorage.setItem(

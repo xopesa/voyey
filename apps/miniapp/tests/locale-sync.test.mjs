@@ -98,8 +98,8 @@ function mounted({
   initData = authenticated ? "synthetic-test-input" : "",
 } = {}) {
   const values = new Map([
-    ["stenzo.locale", "ru"],
-    ["stenzo.theme", "dark"],
+    ["voyey.locale", "ru"],
+    ["voyey.theme", "dark"],
   ]);
   const requests = [],
     effects = [];

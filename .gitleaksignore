@@ -1,0 +1,11 @@
+# Reviewed exact fingerprints only; no whole source/test file is excluded.
+# Synthetic order/idempotency keys in isolated fixtures:
+apps/admin/tests/customers.test.mjs:generic-api-key:221
+apps/api/tests/checkout-orders.test.ts:generic-api-key:340
+apps/api/tests/checkout-orders.test.ts:generic-api-key:366
+apps/api/tests/checkout-orders.test.ts:generic-api-key:508
+apps/worker/tests/promotions.test.ts:generic-api-key:180
+# Historical PostgreSQL test-only JWT literal; not a runtime credential:
+scripts/check-pg15.mjs:generic-api-key:34
+# Public Access audience identifier retained ONLY as a forbidden value:
+apps/worker/src/isolation.ts:generic-api-key:3

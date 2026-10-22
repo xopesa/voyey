@@ -88,7 +88,7 @@ export function manualPayload(
     ...(code.trim() ? { promoCode: code.trim().toUpperCase() } : {}),
   };
 }
-const journalKey = (id: string) => `stenzo.manual-attempt:${id}`;
+const journalKey = (id: string) => `voyey.manual-attempt:${id}`;
 export function readManualAttempt(
   id: string,
 ): { key: string; uncertain: boolean } | null {

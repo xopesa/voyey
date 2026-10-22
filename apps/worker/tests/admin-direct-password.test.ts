@@ -130,7 +130,7 @@ test("direct password mode works without Access; anonymous APIs, old sessions, b
       (
         await call("auth/session", "GET", {
           ...base,
-          cookie: "stenzo_admin_session=" + oldToken,
+          cookie: "voyey_admin_session=" + oldToken,
         })
       ).status,
       401,

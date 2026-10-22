@@ -7,17 +7,21 @@
     "node": "24.x"
   },
   "scripts": {
-    "dev": "turbo run dev",
+    "dev": "node scripts/worker-local.mjs dev",
     "build": "node scripts/build.mjs",
-    "lint": "turbo run lint",
+    "lint": "pnpm lint:config && turbo run lint",
     "typecheck": "turbo run typecheck",
-    "test": "turbo run test",
+    "test": "pnpm test:config && turbo run test --concurrency=1",
     "format": "prettier --write .",
     "db:generate": "pnpm --filter @stenzo/database db:generate",
     "db:migrate": "pnpm --filter @stenzo/database db:migrate",
     "db:migrate:deploy": "pnpm --filter @stenzo/database db:migrate:deploy",
     "db:seed": "pnpm --filter @stenzo/database db:seed",
-    "admin:password": "pnpm --filter @stenzo/api admin:password"
+    "admin:password": "node scripts/blocked-remote.mjs",
+    "config:check": "node scripts/check-preview.mjs",
+    "test:config": "node --test scripts/voyey-isolation.test.mjs",
+    "deploy": "node scripts/blocked-remote.mjs",
+    "lint:config": "eslint scripts/check-preview.mjs scripts/worker-local.mjs scripts/blocked-remote.mjs scripts/voyey-isolation.test.mjs scripts/register-preview-webhook.mjs scripts/set-preview-admin-password.mjs scripts/validate-telegram.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",

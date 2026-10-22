@@ -217,7 +217,7 @@ test("actual Worker requires Access AND password; no bypass, strict origin/CSRF,
         oldPrincipal,
       )
       .run();
-    const legacy = { ...access, cookie: "stenzo_admin_session=" + oldToken };
+    const legacy = { ...access, cookie: "voyey_admin_session=" + oldToken };
     assert.equal((await call("auth/session", "GET", legacy)).status, 401);
     assert.equal((await call("auth/access", "POST", legacy)).status, 401);
     assert.equal((await call("catalog/categories", "GET", legacy)).status, 401);

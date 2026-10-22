@@ -2,6 +2,7 @@ import Fastify, {
   type FastifyInstance,
   type FastifyServerOptions,
 } from "fastify";
+import { infrastructureIsolated, isStenzoHost } from "./isolation.js";
 import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import { isIP } from "node:net";
 import { handleAsNodeRequest } from "cloudflare:node";
@@ -100,6 +101,7 @@ export interface Env {
   PRIVATE_PROOFS?: R2Bucket;
   PREVIEW_ONLY: string;
   COMMERCE_ENABLED: string;
+  VOYEY_LOCAL_ONLY?: string;
   PUBLIC_ORIGIN?: string;
   ADMIN_ORIGIN?: string;
   ACCESS_TEAM_DOMAIN?: string;
@@ -673,19 +675,13 @@ async function api(request: Request, env: Env) {
       ? configured()
       : run();
 }
-const protectedHosts = new Set([
-  "stenzo.uz",
-  "www.stenzo.uz",
-  "api.stenzo.uz",
-  "admin.stenzo.uz",
-]);
 function validOrigin(value?: string): boolean {
   try {
     const url = new URL(value ?? "");
     return (
       url.origin === value &&
       url.protocol === "https:" &&
-      !protectedHosts.has(url.hostname) &&
+      !isStenzoHost(url.hostname) &&
       !url.username &&
       !url.password
     );
@@ -784,10 +780,12 @@ async function webhook(request: Request, env: Env) {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
-    // This independently deployable Worker has no route to any Turon host or database.
+    // Fail before touching D1, storage, redirects, Access or Telegram.
     if (env.PREVIEW_ONLY !== "1")
       return json({ error: "Preview isolation guard is required" }, 503);
-    if (protectedHosts.has(url.hostname))
+    if (!infrastructureIsolated(env))
+      return json({ error: "VOYEY infrastructure isolation check failed" }, 503);
+    if (isStenzoHost(url.hostname))
       return json({ error: "Existing production host is not a target" }, 503);
     try {
       if (url.pathname === "/health")

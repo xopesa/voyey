@@ -43,7 +43,7 @@ export default function RootLayout({
     <html lang="uz" className={inter.variable} suppressHydrationWarning>
       <head>
         <script
-          id="stenzo-preferences"
+          id="voyey-preferences"
           dangerouslySetInnerHTML={{ __html: preferenceScript }}
         />
       </head>

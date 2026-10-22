@@ -439,7 +439,7 @@ describe("admin catalog API", () => {
       method: "POST",
       url: "/admin/auth/login",
       headers: { origin, "x-stenzo-admin": "1" },
-      payload: { login: "odilbek_admin", password },
+      payload: { login: "voyey_admin", password },
     });
     expect(login.statusCode).toBe(200);
     const headers = {

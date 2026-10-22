@@ -17,14 +17,14 @@ function fixture(
   const fetcher = async (url: string, init: RequestInit) => {
     const method = new URL(url).pathname.split("/").at(-1)!;
     calls.push({ method, payload: JSON.parse(String(init.body)) });
-    if (new URL(url).hostname === "cf.stenzo.uz")
+    if (new URL(url).hostname === "store.voyey.example.invalid")
       return Response.json(
         { ok: true },
         { status: Number(overrides.probeStatus ?? 200) },
       );
     const defaults = {
       getMe: { username: config.username },
-      getWebhookInfo: { url: "https://cf.stenzo.uz/telegram/webhook" },
+      getWebhookInfo: { url: "https://store.voyey.example.invalid/telegram/webhook" },
       getChatMenuButton: { type: "commands" },
       setWebhook: true,
     };
@@ -42,7 +42,7 @@ test("preview webhook registration preserves pending updates and limits update t
   const result = await f.run();
   assert.equal(result.registered, true);
   const payload = f.calls.find((c) => c.method === "setWebhook")!.payload;
-  assert.equal(payload.url, "https://cf.stenzo.uz/telegram/webhook");
+  assert.equal(payload.url, "https://store.voyey.example.invalid/telegram/webhook");
   assert.equal(payload.drop_pending_updates, false);
   assert.equal(payload.max_connections, 1);
   assert.deepEqual(payload.allowed_updates, ["message", "callback_query"]);

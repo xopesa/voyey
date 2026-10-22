@@ -514,7 +514,7 @@ test("live preview config remains commerce=0 and isolated stock tests make no ex
   const config = JSON.parse(
     readFileSync(new URL("../wrangler.jsonc", import.meta.url), "utf8"),
   );
-  assert.equal(config.name, "stenzo-free-preview");
+  assert.equal(config.name, "voyey-local");
   assert.equal(config.vars.COMMERCE_ENABLED, "0");
   assert.equal(outboundCalls, 0);
 });

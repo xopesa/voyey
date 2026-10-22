@@ -1,27 +1,31 @@
+# Historical PostgreSQL adapter only; the active VOYEY runtime uses D1.
+# No service starts with default `docker compose up` at stage 1.1.
+name: voyey-legacy-inactive
 services:
   postgres:
+    profiles: ["legacy-disabled"]
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-stenzo_wear}
-      POSTGRES_USER: ${POSTGRES_USER:-stenzo}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set STENZO POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-voyey_legacy}
+      POSTGRES_USER: ${POSTGRES_USER:-voyey_legacy}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Legacy PostgreSQL is disabled for this stage}
     ports:
       - "127.0.0.1:5432:5432"
     volumes:
-      - stenzo_postgres_data:/var/lib/postgresql/data
+      - voyey_legacy_postgres_data:/var/lib/postgresql/data
     healthcheck:
       test:
         [
           "CMD",
           "pg_isready",
           "-U",
-          "${POSTGRES_USER:-stenzo}",
+          "${POSTGRES_USER:-voyey_legacy}",
           "-d",
-          "${POSTGRES_DB:-stenzo_wear}",
+          "${POSTGRES_DB:-voyey_legacy}",
         ]
       interval: 5s
       timeout: 5s
       retries: 10
 
 volumes:
-  stenzo_postgres_data:
+  voyey_legacy_postgres_data:

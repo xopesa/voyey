@@ -1,4 +1,4 @@
-const accessTokenKey = "stenzo.access-token";
+const accessTokenKey = "voyey.access-token";
 
 export function readAccessToken(): string | null {
   if (typeof window === "undefined") return null;

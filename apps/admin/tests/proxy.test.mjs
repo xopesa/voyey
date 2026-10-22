@@ -92,7 +92,7 @@ function request(method, headers = {}, body = "") {
     headers: new Headers(headers),
     cookies: {
       get: (name) =>
-        name === "stenzo_admin_session" ? { value: "test-session" } : undefined,
+        name === "voyey_admin_session" ? { value: "test-session" } : undefined,
     },
     body: body ? new Response(body).body : null,
     nextUrl: { search: "" },
@@ -203,7 +203,7 @@ test("dashboard GET proxy preserves period query and session, without admitting 
       assert.equal(init.method, "GET");
       assert.equal(
         init.headers.get("cookie"),
-        "stenzo_admin_session=test-session",
+        "voyey_admin_session=test-session",
       );
       return Response.json({ kpis: {} });
     },
@@ -392,7 +392,7 @@ test("private proof proxy streams original bytes with session-only no-store secu
     assert.equal(url, "http://api.test/admin/payments/id/proof");
     assert.equal(
       init.headers.get("cookie"),
-      "stenzo_admin_session=test-session",
+      "voyey_admin_session=test-session",
     );
     assert.equal(init.headers.get("authorization"), null);
     return new Response(bytes, { headers: { "content-type": "image/png" } });
@@ -484,10 +484,10 @@ test("bodyless activation and logout work through the proxy against Fastify", as
     app.post(`/admin/${path}`, async (req, reply) => {
       assert.equal(req.headers.origin, origin);
       assert.equal(req.headers["x-csrf-token"], "test-csrf");
-      assert.equal(req.headers.cookie, "stenzo_admin_session=test-session");
+      assert.equal(req.headers.cookie, "voyey_admin_session=test-session");
       reply.header(
         "set-cookie",
-        "stenzo_admin_session=; HttpOnly; SameSite=Strict; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT",
+        "voyey_admin_session=; HttpOnly; SameSite=Strict; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT",
       );
       return { ok: true };
     });
@@ -541,7 +541,7 @@ test("proxy preserves JSON mutations and cookie attributes, drops bearer and unr
     assert.equal(init.headers.get("authorization"), null);
     assert.equal(
       init.headers.get("cookie"),
-      "stenzo_admin_session=test-session",
+      "voyey_admin_session=test-session",
     );
     return Response.json(
       { category: { id: "id" } },
@@ -549,7 +549,7 @@ test("proxy preserves JSON mutations and cookie attributes, drops bearer and unr
         status: 201,
         headers: {
           "set-cookie":
-            "stenzo_admin_session=test; HttpOnly; Secure; SameSite=Strict; Path=/",
+            "voyey_admin_session=test; HttpOnly; Secure; SameSite=Strict; Path=/",
         },
       },
     );
@@ -658,7 +658,7 @@ test("proxy preserves binary multipart bytes, upload metadata and session CSRF h
     assert.equal(init.headers.get("x-csrf-token"), "test-csrf");
     assert.equal(
       init.headers.get("cookie"),
-      "stenzo_admin_session=test-session",
+      "voyey_admin_session=test-session",
     );
     const parsed = await new Response(init.body, {
       headers: init.headers,

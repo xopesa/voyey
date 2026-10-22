@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { infrastructureIsolated } from "./isolation.js";
 import {
   createRemoteJWKSet,
   jwtVerify,
@@ -15,6 +16,8 @@ export interface AccessIdentity {
 }
 const keys = new Map<string, JWTVerifyGetKey>();
 export function accessConfiguration(config: AccessConfig) {
+  if (!infrastructureIsolated(config))
+    throw new Error("STENZO Access identity is forbidden in VOYEY");
   const issuer = config.ACCESS_TEAM_DOMAIN ?? "";
   if (
     !/^https:\/\/[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.cloudflareaccess\.com$/i.test(

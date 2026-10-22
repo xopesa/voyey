@@ -1,5 +1,6 @@
 import Fastify from "fastify";
 import { describe, expect, it } from "vitest";
+import { SignJWT, decodeJwt } from "jose";
 
 import { registerAdminRoutes } from "../src/modules/admin/route.js";
 import { registerAuthRoutes } from "../src/modules/auth/route.js";
@@ -74,6 +75,28 @@ function createFixture() {
 }
 
 describe("Telegram auth flow", () => {
+  it("issues VOYEY JWTs and refuses STENZO issuer/audience even with the same signing key", async () => {
+    const service = new JwtTokenService(jwtSecret);
+    expect(decodeJwt(await service.issue("user-1"))).toMatchObject({
+      iss: "voyey-api",
+      aud: "voyey-miniapp",
+    });
+    for (const [issuer, audience] of [
+      ["stenzo-api", "stenzo-miniapp"],
+      ["stenzo-api", "voyey-miniapp"],
+      ["voyey-api", "stenzo-miniapp"],
+    ]) {
+      const legacy = await new SignJWT({})
+        .setProtectedHeader({ alg: "HS256" })
+        .setSubject("user-1")
+        .setIssuer(issuer!)
+        .setAudience(audience!)
+        .setIssuedAt()
+        .setExpirationTime("1h")
+        .sign(new TextEncoder().encode(jwtSecret));
+      await expect(service.verify(legacy)).rejects.toThrow();
+    }
+  });
   it("keeps Telegram RU metadata separate from default UZ; authenticated preference survives reauth", async () => {
     const { app } = createFixture();
     const initData = createTelegramInitData(

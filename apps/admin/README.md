@@ -3,7 +3,7 @@
 From the repository root, run `pnpm admin:password` in an interactive terminal.
 The command asks for the password twice without displaying it and writes only an
 Argon2id hash to the ignored local `.env`. Use at least 12 characters. The login
-is `odilbek_admin`. Restart the API after setting or changing the hash.
+is `voyey_admin`. Restart the API after setting or changing the hash.
 No password is provided by default: web login stays disabled until configured.
 
 Run the API with `pnpm --filter @stenzo/api dev`, and the panel with
@@ -22,7 +22,7 @@ requests through the panel proxy share its source-IP limit.
 This stage supports one API process: sessions and throttling are in memory;
 API restart invalidates sessions and resets throttling. Use a shared session and
 limiter store before running multiple API instances. Catalog changes use the
-existing catalog service and audit log, with `adminPrincipal=odilbek_admin`.
+existing catalog service and audit log, with `adminPrincipal=voyey_admin`.
 Telegram/JWT admin access remains available through its existing guard; web
 admin access is restricted to catalog management, orders and payment review. Category and product removal
 are not exposed by the existing API; use deactivation.

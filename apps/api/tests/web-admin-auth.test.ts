@@ -1,4 +1,4 @@
-import { randomBytes } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
 import { argon2id, hash } from "argon2";
 import Fastify from "fastify";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -16,6 +16,7 @@ import {
 import { JwtTokenService } from "../src/modules/auth/token.js";
 import { createAuthGuard } from "../src/modules/auth/middleware.js";
 import { createTestUserService } from "./helpers/auth.js";
+import { MemoryAdminSessionStore } from "../src/modules/admin/session-store.js";
 
 const origin = "http://localhost:3002";
 const password = randomBytes(32).toString("base64url");
@@ -89,6 +90,38 @@ async function session(app: App) {
 }
 
 describe("web admin authentication", () => {
+  it("isolates cookie names and rejects an old session hash in a shared synthetic store", async () => {
+    expect(COOKIE_NAME).toBe("voyey_admin_session");
+    const store = new MemoryAdminSessionStore();
+    const legacyToken = randomBytes(32).toString("base64url");
+    await store.create(
+      createHash("sha256").update(legacyToken).digest("hex"),
+      {
+        csrfToken: "synthetic",
+        expiresAt: Date.now() + 60_000,
+      },
+      Date.now(),
+    );
+    const sessions = new WebAdminSessions("", origin, false, Date.now, store);
+    expect(await sessions.get(legacyToken)).toBeNull();
+    const issued = await sessions.issueSession();
+    expect(await sessions.get(issued.token)).not.toBeNull();
+    const { app } = fixture();
+    const signed = await session(app);
+    const response = await app.inject({
+      method: "GET",
+      url: "/admin/dashboard",
+      headers: {
+        ...signed,
+        cookie: signed.cookie.replace(
+          "voyey_admin_session",
+          "stenzo_admin_session",
+        ),
+      },
+    });
+    expect(response.statusCode).toBe(401);
+    await app.close();
+  });
   it("sets an opaque HttpOnly bounded cookie, no-store and Secure in production", async () => {
     const { app } = fixture(true);
     const response = await login(app);

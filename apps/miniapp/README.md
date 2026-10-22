@@ -367,9 +367,9 @@ All UI translations live in `src/lib/i18n.ts`; translation keys and Uzbek
 dictionary completeness are checked by TypeScript. RU is the default; Telegram
 `initDataUnsafe.user.language_code` values beginning with `uz` select Uzbek Latin.
 These unverified Telegram fields are used only for presentation, never auth.
-Explicit language choices persist in localStorage under `stenzo.locale`.
+Explicit language choices persist in localStorage under `voyey.locale`.
 
-Appearance supports `light`, `dark` and `system`, persisted under `stenzo.theme`.
+Appearance supports `light`, `dark` and `system`, persisted under `voyey.theme`.
 System prioritizes Telegram's `colorScheme` and listens to `themeChanged`, falling
 back to the device's `prefers-color-scheme` with live change updates. The SDK's
 ordinary-browser stub (`platform=unknown`, empty initData) is ignored for theme

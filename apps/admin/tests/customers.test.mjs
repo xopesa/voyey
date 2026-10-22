@@ -220,7 +220,7 @@ test("manual journal stores only idempotency state and survives reload without P
     ),
     { key: "isolated-order-key-0001", uncertain: true },
   );
-  storage.set("stenzo.manual-attempt:a", "malformed");
+  storage.set("voyey.manual-attempt:a", "malformed");
   assert.equal(manual.readManualAttempt("a"), null);
   manual.clearManualAttempt("a");
   assert.equal(storage.size, 0);

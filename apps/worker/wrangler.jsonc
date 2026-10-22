@@ -1,16 +1,13 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "stenzo-free-preview",
-  "account_id": "21451653d8243b3dcfab6c23b8f9cc04",
+  "name": "voyey-local",
+  "account_id": "00000000000000000000000000000000",
   "main": "src/index.ts",
   "compatibility_date": "2026-10-15",
   "compatibility_flags": ["nodejs_compat"],
-  "workers_dev": true,
+  "workers_dev": false,
   "preview_urls": false,
-  "routes": [
-    { "pattern": "cf.stenzo.uz", "custom_domain": true },
-    { "pattern": "cf-admin.stenzo.uz", "custom_domain": true }
-  ],
+  "routes": [],
   "assets": {
     "directory": "public",
     "binding": "ASSETS",
@@ -18,24 +15,27 @@
     "not_found_handling": "none",
     "run_worker_first": ["/api/*", "/media/*", "/telegram/*", "/health"]
   },
-  "alias": { "argon2": "./src/password-disabled.ts" },
-  "observability": { "enabled": false },
+  "alias": {
+    "argon2": "./src/password-disabled.ts"
+  },
+  "observability": {
+    "enabled": false
+  },
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "stenzo-free-preview",
-      "database_id": "ed46a2ff-cff3-4b00-9853-d2438a57e806",
+      "database_name": "voyey-local",
+      "database_id": "00000000-0000-0000-0000-000000000000",
       "migrations_dir": "migrations"
     }
   ],
   "vars": {
     "PREVIEW_ONLY": "1",
     "COMMERCE_ENABLED": "0",
-    "PUBLIC_ORIGIN": "https://cf.stenzo.uz",
-    "ADMIN_ORIGIN": "https://cf-admin.stenzo.uz",
+    "VOYEY_LOCAL_ONLY": "1",
+    "PUBLIC_ORIGIN": "https://store.voyey.example.invalid",
+    "ADMIN_ORIGIN": "https://admin.voyey.example.invalid",
     "ADMIN_AUTH_MODE": "password",
-    "ADMIN_ACCESS_EMAILS": "admin@example.invalid",
-    "ACCESS_TEAM_DOMAIN": "https://cool-bush-5c50.cloudflareaccess.com",
-    "ACCESS_AUD": "b8e4a1545e95be70497d182d85814439456c09534a20f36dd20c99dad70fffc0"
+    "ADMIN_ACCESS_EMAILS": "admin@example.invalid"
   }
 }

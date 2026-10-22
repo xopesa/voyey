@@ -220,7 +220,7 @@ export class PaymentResource {
 export function readPaymentAttempt(): Attempt | null {
   try {
     const value = JSON.parse(
-      sessionStorage.getItem("stenzo.payment-attempt") ?? "null",
+      sessionStorage.getItem("voyey.payment-attempt") ?? "null",
     );
     return value &&
       typeof value.publicId === "string" &&
@@ -235,7 +235,7 @@ export function readPaymentAttempt(): Attempt | null {
 }
 export function writePaymentAttempt(value: Attempt) {
   try {
-    sessionStorage.setItem("stenzo.payment-attempt", JSON.stringify(value));
+    sessionStorage.setItem("voyey.payment-attempt", JSON.stringify(value));
   } catch {
     /* In-memory locking and server validation remain active. */
   }

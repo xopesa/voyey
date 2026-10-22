@@ -57,9 +57,9 @@ async function proxy(
     const value = request.headers.get(name);
     if (value) headers.set(name, value);
   }
-  const token = request.cookies.get("stenzo_admin_session")?.value;
+  const token = request.cookies.get("voyey_admin_session")?.value;
   if (token)
-    headers.set("cookie", `stenzo_admin_session=${encodeURIComponent(token)}`);
+    headers.set("cookie", `voyey_admin_session=${encodeURIComponent(token)}`);
   if (
     (process.env.VERCEL ||
       (process.env.NODE_ENV === "production" &&

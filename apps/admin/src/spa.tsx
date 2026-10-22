@@ -105,8 +105,8 @@ export function Routes() {
 }
 try {
   document.documentElement.lang =
-    localStorage.getItem("stenzo.locale") === "uz" ? "uz" : "ru";
-  const saved = localStorage.getItem("stenzo.theme");
+    localStorage.getItem("voyey.locale") === "uz" ? "uz" : "ru";
+  const saved = localStorage.getItem("voyey.theme");
   document.documentElement.dataset.theme =
     saved === "light" || saved === "dark"
       ? saved
