@@ -306,6 +306,7 @@ class MemoryAdminCatalogRepository implements AdminCatalogRepository {
       id: `variant-${this.nextId++}`,
       productId,
       ...input,
+      size: input.size ?? "",
       createdAt: timestamp,
       updatedAt: timestamp,
     };

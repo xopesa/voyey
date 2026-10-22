@@ -1,4 +1,9 @@
 import { adminPrincipalHash } from "./principal.js";
+import {
+  categoryDefinitions,
+  categoryAttributeValues,
+  assertCategoryAttributesCompatible,
+} from "../modules/admin/catalog/attributes.js";
 import type { CheckoutLine } from "../modules/checkout/domain.js";
 import type { PreparedOrder } from "../modules/orders/types.js";
 import { atomic, Batch, prisma } from "@stenzo/database";
@@ -630,7 +635,11 @@ export class D1AdminCatalogRepository extends PrismaAdminCatalogRepository {
   }
   override async createCategory(actor: string, input: CategoryCreateInput) {
     const id = await this.mutate(async (b) => {
-      const id = b.insert("Category", { ...input });
+      const definitions = categoryDefinitions(input.attributeDefinitions);
+      const id = b.insert("Category", {
+        ...input,
+        attributeDefinitions: definitions,
+      });
       audit(b, actor, "category.create", "Category", id, { slug: input.slug });
       return id;
     });
@@ -644,9 +653,27 @@ export class D1AdminCatalogRepository extends PrismaAdminCatalogRepository {
     await this.mutate(async (b) => {
       const current = await prisma.category.findUnique({ where: { id } });
       if (!current) throw new AdminCatalogCategoryNotFoundError();
-      b.update("Category", id, { ...input });
+      const definitions =
+        input.attributeDefinitions === undefined
+          ? undefined
+          : categoryDefinitions(input.attributeDefinitions);
+      if (definitions !== undefined)
+        await assertCategoryAttributesCompatible(
+          id,
+          current.attributeDefinitions,
+          definitions,
+        );
+      b.update("Category", id, {
+        ...input,
+        ...(definitions === undefined
+          ? {}
+          : { attributeDefinitions: definitions }),
+      });
       audit(b, actor, "category.update", "Category", id, {
         slug: input.slug ?? current.slug,
+        ...(definitions === undefined
+          ? {}
+          : { attributeKeys: definitions.map((d) => d.key) }),
       });
     });
     return prisma.category.findUniqueOrThrow({ where: { id } });
@@ -682,12 +709,20 @@ export class D1AdminCatalogRepository extends PrismaAdminCatalogRepository {
       if (category.archivedAt) throw new HttpError(409, "archiveCategoryFirst");
       if (!validPromotion(input))
         throw new HttpError(400, "Invalid product promotion");
-      const id = b.insert("Product", { ...input });
+      const attributes = categoryAttributeValues(
+        category.attributeDefinitions,
+        input.attributes,
+        "PRODUCT",
+      );
+      const id = b.insert("Product", { ...input, attributes });
       if (input.salePrice != null)
         audit(b, actor, "product.promotion.update", "Product", id, {});
       audit(b, actor, "product.create", "Product", id, {
         slug: input.slug,
         categoryId: input.categoryId,
+        ...(Object.keys(attributes).length
+          ? { attributeKeys: Object.keys(attributes) }
+          : {}),
       });
       return id;
     });
@@ -712,6 +747,37 @@ export class D1AdminCatalogRepository extends PrismaAdminCatalogRepository {
       });
       if (category?.archivedAt)
         throw new HttpError(409, "archiveCategoryFirst");
+      const attributes = categoryAttributeValues(
+        category?.attributeDefinitions,
+        input.attributes === undefined ? current.attributes : input.attributes,
+        "PRODUCT",
+      );
+      if (next.categoryId !== current.categoryId) {
+        const used = new Set([
+          ...Object.keys(attributes),
+          ...current.variants.flatMap((v) => Object.keys(v.attributes ?? {})),
+        ]);
+        const oldDefinitions = categoryDefinitions(
+          current.category.attributeDefinitions,
+        );
+        const newDefinitions = categoryDefinitions(
+          category?.attributeDefinitions,
+        );
+        if (
+          oldDefinitions.some(
+            (d) =>
+              used.has(d.key) &&
+              newDefinitions.find((n) => n.key === d.key)?.unit !== d.unit,
+          )
+        )
+          throw new HttpError(400, "Incompatible catalog attribute units");
+        for (const variant of current.variants)
+          categoryAttributeValues(
+            category?.attributeDefinitions,
+            variant.attributes,
+            "VARIANT",
+          );
+      }
       if (!validPromotion(next))
         throw new HttpError(400, "Invalid product promotion");
       const saleKeys = ["salePrice", "saleStartsAt", "saleEndsAt"] as const;
@@ -721,10 +787,17 @@ export class D1AdminCatalogRepository extends PrismaAdminCatalogRepository {
       const regularChanged = Object.keys(input).some(
         (key) =>
           !saleKeys.includes(key as (typeof saleKeys)[number]) &&
-          String(current[key as keyof ProductPatchInput] ?? "") !==
-            String(input[key as keyof ProductPatchInput] ?? ""),
+          (key === "attributes"
+            ? JSON.stringify(current.attributes ?? {}) !==
+              JSON.stringify(attributes)
+            : String(current[key as keyof ProductPatchInput] ?? "") !==
+              String(input[key as keyof ProductPatchInput] ?? "")),
       );
-      if (changed || regularChanged) b.update("Product", id, { ...input });
+      if (changed || regularChanged)
+        b.update("Product", id, {
+          ...input,
+          ...(input.attributes === undefined ? {} : { attributes }),
+        });
       if (changed)
         audit(
           b,
@@ -740,6 +813,9 @@ export class D1AdminCatalogRepository extends PrismaAdminCatalogRepository {
         audit(b, actor, "product.update", "Product", id, {
           slug: input.slug ?? current.slug,
           categoryId: input.categoryId ?? current.categoryId,
+          ...(input.attributes === undefined
+            ? {}
+            : { attributeKeys: Object.keys(attributes) }),
         });
     });
     return this.productOrThrow(id);
@@ -777,9 +853,16 @@ export class D1AdminCatalogRepository extends PrismaAdminCatalogRepository {
     input: ProductVariantCreateInput,
   ) {
     const id = await this.mutate(async (b) => {
-      await this.productOrThrow(productId);
+      const product = await this.productOrThrow(productId);
+      const attributes = categoryAttributeValues(
+        product.category.attributeDefinitions,
+        input.attributes,
+        "VARIANT",
+      );
       const id = b.insert("ProductVariant", {
         ...input,
+        size: input.size ?? "",
+        attributes,
         productId,
         preorderEnabled: input.preorderEnabled ?? false,
       });
@@ -787,6 +870,9 @@ export class D1AdminCatalogRepository extends PrismaAdminCatalogRepository {
         productId,
         sku: input.sku,
         preorderEnabled: input.preorderEnabled ?? false,
+        ...(Object.keys(attributes).length
+          ? { attributeKeys: Object.keys(attributes) }
+          : {}),
       });
       return id;
     }, "sku");
@@ -800,13 +886,28 @@ export class D1AdminCatalogRepository extends PrismaAdminCatalogRepository {
     await this.mutate(async (b) => {
       const current = await prisma.productVariant.findUnique({ where: { id } });
       if (!current) throw new AdminCatalogVariantNotFoundError();
-      b.update("ProductVariant", id, { ...input });
+      const attributes =
+        input.attributes === undefined
+          ? undefined
+          : categoryAttributeValues(
+              (await this.productOrThrow(current.productId)).category
+                .attributeDefinitions,
+              input.attributes,
+              "VARIANT",
+            );
+      b.update("ProductVariant", id, {
+        ...input,
+        ...(attributes === undefined ? {} : { attributes }),
+      });
       audit(b, actor, "product-variant.update", "ProductVariant", id, {
         productId: current.productId,
         sku: input.sku ?? current.sku,
         ...(input.preorderEnabled === undefined
           ? {}
           : { preorderEnabled: input.preorderEnabled }),
+        ...(attributes === undefined
+          ? {}
+          : { attributeKeys: Object.keys(attributes) }),
       });
     }, "sku");
     return prisma.productVariant.findUniqueOrThrow({ where: { id } });

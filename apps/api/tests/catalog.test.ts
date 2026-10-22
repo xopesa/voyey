@@ -229,6 +229,7 @@ describe("public catalog API", () => {
           }),
         );
         expect(result.variants[0]).toEqual({
+          attributes: {},
           id: variant.id,
           sku: variant.sku,
           size: variant.size,

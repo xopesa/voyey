@@ -4,7 +4,11 @@ import type {
   CatalogProductRecord,
   CatalogVariantRecord,
 } from "../../catalog/types.js";
-import type { ChannelPublication } from "@stenzo/shared";
+import type {
+  ChannelPublication,
+  CatalogAttributeDefinition,
+  CatalogAttributeValues,
+} from "@stenzo/shared";
 
 export type AdminCategoryRecord = CatalogCategoryRecord;
 export type AdminProductRecord = CatalogProductRecord & {
@@ -17,6 +21,7 @@ export type AdminVariantRecord = CatalogVariantRecord;
 export type ProductStatusValue = "DRAFT" | "ACTIVE" | "INACTIVE";
 
 export interface CategoryCreateInput {
+  attributeDefinitions?: CatalogAttributeDefinition[];
   nameRu: string;
   nameUz: string;
   slug: string;
@@ -25,6 +30,7 @@ export interface CategoryCreateInput {
 }
 
 export interface CategoryPatchInput {
+  attributeDefinitions?: CatalogAttributeDefinition[];
   nameRu?: string;
   nameUz?: string;
   slug?: string;
@@ -32,6 +38,7 @@ export interface CategoryPatchInput {
 }
 
 export interface ProductCreateInput {
+  attributes?: CatalogAttributeValues;
   categoryId: string;
   nameRu: string;
   nameUz: string;
@@ -50,6 +57,7 @@ export interface ProductCreateInput {
 }
 
 export interface ProductPatchInput {
+  attributes?: CatalogAttributeValues;
   categoryId?: string;
   nameRu?: string;
   nameUz?: string;
@@ -87,15 +95,17 @@ export interface ProductImageUploadInput {
 }
 
 export interface ProductVariantCreateInput {
+  attributes?: CatalogAttributeValues;
   preorderEnabled?: boolean;
   sku: string;
-  size: string;
+  size?: string;
   color: string | null;
   stock: number | null;
   isActive: boolean;
 }
 
 export interface ProductVariantPatchInput {
+  attributes?: CatalogAttributeValues;
   preorderEnabled?: boolean;
   sku?: string;
   size?: string;

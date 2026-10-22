@@ -1,6 +1,12 @@
-import type { VariantSaleAvailability } from "@stenzo/shared";
+import type {
+  VariantSaleAvailability,
+  CatalogAttributeDefinition,
+  CatalogAttributeValues,
+} from "@stenzo/shared";
 
 export interface CatalogCategoryRecord {
+  /** Raw JSON from repositories; absent on legacy fixtures. */
+  attributeDefinitions?: unknown;
   archivedAt?: Date | null;
   id: string;
   nameRu: string;
@@ -23,6 +29,7 @@ export interface CatalogImageRecord {
 }
 
 export interface CatalogVariantRecord {
+  attributes?: unknown;
   /** Optional for legacy repository fixtures; migrated D1 rows always have a boolean. */
   preorderEnabled?: boolean;
   id: string;
@@ -37,6 +44,7 @@ export interface CatalogVariantRecord {
 }
 
 export interface CatalogProductRecord {
+  attributes?: unknown;
   archivedAt?: Date | null;
   id: string;
   categoryId: string;
@@ -72,6 +80,7 @@ export interface CatalogProductListResult {
 }
 
 export interface CategoryDto {
+  attributeDefinitions: CatalogAttributeDefinition[];
   id: string;
   nameRu: string;
   nameUz: string;
@@ -87,6 +96,7 @@ export interface ProductImageDto {
 }
 
 export interface ProductVariantDto {
+  attributes: CatalogAttributeValues;
   availability: VariantSaleAvailability;
   id: string;
   sku: string;
@@ -97,6 +107,7 @@ export interface ProductVariantDto {
 }
 
 export interface ProductDto {
+  attributes: CatalogAttributeValues;
   effectivePrice: number;
   isOnSale: boolean;
   id: string;

@@ -489,7 +489,10 @@ export class PrismaAdminCatalogRepository implements AdminCatalogRepository {
         actorId,
         "product-variant.create",
         "ProductVariant",
-        (tx) => tx.productVariant.create({ data: { ...input, productId } }),
+        (tx) =>
+          tx.productVariant.create({
+            data: { ...input, productId, size: input.size ?? "" },
+          }),
         (record) => ({
           productId: record.productId,
           sku: record.sku,

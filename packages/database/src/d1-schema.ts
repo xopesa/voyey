@@ -299,6 +299,14 @@ export const models = {
   },
   Category: {
     fields: {
+      attributeDefinitions: {
+        type: "Json",
+        optional: false,
+        id: false,
+        unique: false,
+        updated: false,
+        default: "[]",
+      },
       archivedAt: {
         type: "DateTime",
         optional: true,
@@ -397,6 +405,14 @@ export const models = {
   },
   Product: {
     fields: {
+      attributes: {
+        type: "Json",
+        optional: false,
+        id: false,
+        unique: false,
+        updated: false,
+        default: "{}",
+      },
       archivedAt: {
         type: "DateTime",
         optional: true,
@@ -836,6 +852,14 @@ export const models = {
   },
   ProductVariant: {
     fields: {
+      attributes: {
+        type: "Json",
+        optional: false,
+        id: false,
+        unique: false,
+        updated: false,
+        default: "{}",
+      },
       preorderEnabled: {
         type: "Boolean",
         optional: false,

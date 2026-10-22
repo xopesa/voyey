@@ -1,4 +1,9 @@
-import { effectiveProductPrice, variantSaleAvailability } from "@stenzo/shared";
+import {
+  effectiveProductPrice,
+  variantSaleAvailability,
+  normalizeCatalogAttributeDefinitions,
+  normalizeCatalogAttributeValues,
+} from "@stenzo/shared";
 import { CatalogProductNotFoundError } from "./errors.js";
 import type { CatalogRepository } from "./repository.js";
 import type {
@@ -11,6 +16,9 @@ import type {
 
 function toCategoryDto(category: CatalogCategoryRecord): CategoryDto {
   return {
+    attributeDefinitions: normalizeCatalogAttributeDefinitions(
+      category.attributeDefinitions,
+    ),
     id: category.id,
     nameRu: category.nameRu,
     nameUz: category.nameUz,
@@ -21,6 +29,7 @@ function toCategoryDto(category: CatalogCategoryRecord): CategoryDto {
 
 export function toProductDto(product: CatalogProductRecord): ProductDto {
   const variants = product.variants.map((variant) => ({
+    attributes: normalizeCatalogAttributeValues(variant.attributes),
     id: variant.id,
     sku: variant.sku,
     size: variant.size,
@@ -33,6 +42,7 @@ export function toProductDto(product: CatalogProductRecord): ProductDto {
     isAvailable: variant.stock === null || variant.stock > 0,
   }));
   return {
+    attributes: normalizeCatalogAttributeValues(product.attributes),
     id: product.id,
     nameRu: product.nameRu,
     nameUz: product.nameUz,
@@ -57,7 +67,7 @@ export function toProductDto(product: CatalogProductRecord): ProductDto {
     availableSizes: [
       ...new Set(
         variants
-          .filter((variant) => variant.isAvailable)
+          .filter((variant) => variant.isAvailable && variant.size !== "")
           .map((variant) => variant.size),
       ),
     ],

@@ -115,6 +115,7 @@ model AuditLog {
 }
 
 model Category {
+  attributeDefinitions Json @default("[]")
   archivedAt DateTime?
   archivedBy String?
   banners Banner[]
@@ -133,6 +134,7 @@ model Category {
 }
 
 model Product {
+  attributes Json @default("{}")
   archivedAt DateTime?
   archivedBy String?
   banners Banner[]
@@ -215,9 +217,11 @@ model ProductImage {
 }
 
 model ProductVariant {
+  attributes Json @default("{}")
   id        String   @id @default(cuid())
   productId String
   sku       String   @unique
+  // Empty string is the backward-compatible representation of no size.
   size      String
   color     String?
   stock     Int?

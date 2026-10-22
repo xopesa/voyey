@@ -1,4 +1,36 @@
 import { z } from "zod";
+import {
+  CatalogAttributesValidationError,
+  normalizeCatalogAttributeDefinitions,
+  normalizeCatalogAttributeValues,
+} from "@stenzo/shared";
+
+export const attributeDefinitionsSchema = z
+  .unknown()
+  .transform((value, context) => {
+    try {
+      return normalizeCatalogAttributeDefinitions(value);
+    } catch (error) {
+      if (!(error instanceof CatalogAttributesValidationError)) throw error;
+      context.addIssue({ code: "custom", message: error.message });
+      return z.NEVER;
+    }
+  });
+export const attributeValuesSchema = z.unknown().transform((value, context) => {
+  try {
+    return normalizeCatalogAttributeValues(value);
+  } catch (error) {
+    if (!(error instanceof CatalogAttributesValidationError)) throw error;
+    context.addIssue({ code: "custom", message: error.message });
+    return z.NEVER;
+  }
+});
+const optionalSizeSchema = z
+  .string()
+  .trim()
+  .max(50)
+  .nullable()
+  .transform((value) => value ?? "");
 
 const utcDate = z.iso
   .datetime({ offset: false })
@@ -34,6 +66,7 @@ const httpUrlSchema = z
 
 export const categoryCreateSchema = z
   .object({
+    attributeDefinitions: attributeDefinitionsSchema.default([]),
     nameRu: localizedNameSchema,
     nameUz: localizedNameSchema,
     slug: slugSchema,
@@ -44,6 +77,7 @@ export const categoryCreateSchema = z
 
 export const categoryPatchSchema = z
   .object({
+    attributeDefinitions: attributeDefinitionsSchema.optional(),
     nameRu: localizedNameSchema.optional(),
     nameUz: localizedNameSchema.optional(),
     slug: slugSchema.optional(),
@@ -54,6 +88,7 @@ export const categoryPatchSchema = z
 
 export const productCreateSchema = z
   .object({
+    attributes: attributeValuesSchema.default({}),
     ...saleFields,
     publishToChannel: z.boolean().optional(),
     costPrice: z.number().int().positive().max(MAX_INT32).nullable().optional(),
@@ -73,6 +108,7 @@ export const productCreateSchema = z
 
 export const productPatchSchema = z
   .object({
+    attributes: attributeValuesSchema.optional(),
     ...saleFields,
     publishToChannel: z.boolean().optional(),
     costPrice: z.number().int().positive().max(MAX_INT32).nullable().optional(),
@@ -127,9 +163,10 @@ export const imageUploadQuerySchema = z
 
 export const variantCreateSchema = z
   .object({
+    attributes: attributeValuesSchema.default({}),
     preorderEnabled: z.boolean().default(false),
     sku: z.string().trim().min(1).max(100),
-    size: z.string().trim().min(1).max(50),
+    size: optionalSizeSchema.default(""),
     color: z.string().trim().min(1).max(100).nullable().default(null),
     stock: z
       .number()
@@ -144,9 +181,10 @@ export const variantCreateSchema = z
 
 export const variantPatchSchema = z
   .object({
+    attributes: attributeValuesSchema.optional(),
     preorderEnabled: z.boolean().optional(),
     sku: z.string().trim().min(1).max(100).optional(),
-    size: z.string().trim().min(1).max(50).optional(),
+    size: optionalSizeSchema.optional(),
     color: z.string().trim().min(1).max(100).nullable().optional(),
     stock: z.number().int().nonnegative().max(MAX_INT32).nullable().optional(),
     isActive: z.boolean().optional(),
