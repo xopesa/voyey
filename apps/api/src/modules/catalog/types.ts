@@ -1,3 +1,5 @@
+import type { VariantSaleAvailability } from "@stenzo/shared";
+
 export interface CatalogCategoryRecord {
   archivedAt?: Date | null;
   id: string;
@@ -21,6 +23,8 @@ export interface CatalogImageRecord {
 }
 
 export interface CatalogVariantRecord {
+  /** Optional for legacy repository fixtures; migrated D1 rows always have a boolean. */
+  preorderEnabled?: boolean;
   id: string;
   productId: string;
   sku: string;
@@ -83,6 +87,7 @@ export interface ProductImageDto {
 }
 
 export interface ProductVariantDto {
+  availability: VariantSaleAvailability;
   id: string;
   sku: string;
   size: string;

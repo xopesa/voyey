@@ -221,6 +221,8 @@ model ProductVariant {
   size      String
   color     String?
   stock     Int?
+  // Independent catalog permission. Does not change stock=NULL or enable checkout.
+  preorderEnabled Boolean @default(false)
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

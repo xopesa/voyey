@@ -490,7 +490,11 @@ export class PrismaAdminCatalogRepository implements AdminCatalogRepository {
         "product-variant.create",
         "ProductVariant",
         (tx) => tx.productVariant.create({ data: { ...input, productId } }),
-        (record) => ({ productId: record.productId, sku: record.sku }),
+        (record) => ({
+          productId: record.productId,
+          sku: record.sku,
+          preorderEnabled: record.preorderEnabled,
+        }),
       );
     } catch (error) {
       if (prismaCode(error) === "P2002")
@@ -512,7 +516,13 @@ export class PrismaAdminCatalogRepository implements AdminCatalogRepository {
         "product-variant.update",
         "ProductVariant",
         (tx) => tx.productVariant.update({ where: { id }, data: input }),
-        (record) => ({ productId: record.productId, sku: record.sku }),
+        (record) => ({
+          productId: record.productId,
+          sku: record.sku,
+          ...(input.preorderEnabled === undefined
+            ? {}
+            : { preorderEnabled: record.preorderEnabled }),
+        }),
       );
     } catch (error) {
       if (prismaCode(error) === "P2002")

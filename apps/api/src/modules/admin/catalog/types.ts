@@ -87,6 +87,7 @@ export interface ProductImageUploadInput {
 }
 
 export interface ProductVariantCreateInput {
+  preorderEnabled?: boolean;
   sku: string;
   size: string;
   color: string | null;
@@ -95,6 +96,7 @@ export interface ProductVariantCreateInput {
 }
 
 export interface ProductVariantPatchInput {
+  preorderEnabled?: boolean;
   sku?: string;
   size?: string;
   color?: string | null;

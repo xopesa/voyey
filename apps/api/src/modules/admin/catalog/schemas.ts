@@ -127,6 +127,7 @@ export const imageUploadQuerySchema = z
 
 export const variantCreateSchema = z
   .object({
+    preorderEnabled: z.boolean().default(false),
     sku: z.string().trim().min(1).max(100),
     size: z.string().trim().min(1).max(50),
     color: z.string().trim().min(1).max(100).nullable().default(null),
@@ -143,6 +144,7 @@ export const variantCreateSchema = z
 
 export const variantPatchSchema = z
   .object({
+    preorderEnabled: z.boolean().optional(),
     sku: z.string().trim().min(1).max(100).optional(),
     size: z.string().trim().min(1).max(50).optional(),
     color: z.string().trim().min(1).max(100).nullable().optional(),

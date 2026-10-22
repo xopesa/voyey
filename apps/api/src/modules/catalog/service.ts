@@ -1,4 +1,4 @@
-import { effectiveProductPrice } from "@stenzo/shared";
+import { effectiveProductPrice, variantSaleAvailability } from "@stenzo/shared";
 import { CatalogProductNotFoundError } from "./errors.js";
 import type { CatalogRepository } from "./repository.js";
 import type {
@@ -26,6 +26,10 @@ export function toProductDto(product: CatalogProductRecord): ProductDto {
     size: variant.size,
     color: variant.color,
     stock: variant.stock,
+    availability: variantSaleAvailability(
+      variant.stock,
+      variant.preorderEnabled,
+    ),
     isAvailable: variant.stock === null || variant.stock > 0,
   }));
   return {

@@ -778,10 +778,15 @@ export class D1AdminCatalogRepository extends PrismaAdminCatalogRepository {
   ) {
     const id = await this.mutate(async (b) => {
       await this.productOrThrow(productId);
-      const id = b.insert("ProductVariant", { ...input, productId });
+      const id = b.insert("ProductVariant", {
+        ...input,
+        productId,
+        preorderEnabled: input.preorderEnabled ?? false,
+      });
       audit(b, actor, "product-variant.create", "ProductVariant", id, {
         productId,
         sku: input.sku,
+        preorderEnabled: input.preorderEnabled ?? false,
       });
       return id;
     }, "sku");
@@ -799,6 +804,9 @@ export class D1AdminCatalogRepository extends PrismaAdminCatalogRepository {
       audit(b, actor, "product-variant.update", "ProductVariant", id, {
         productId: current.productId,
         sku: input.sku ?? current.sku,
+        ...(input.preorderEnabled === undefined
+          ? {}
+          : { preorderEnabled: input.preorderEnabled }),
       });
     }, "sku");
     return prisma.productVariant.findUniqueOrThrow({ where: { id } });

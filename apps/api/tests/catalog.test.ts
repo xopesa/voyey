@@ -203,6 +203,56 @@ function createApp() {
 }
 
 describe("public catalog API", () => {
+  it.each([null, 0, 3])(
+    "keeps legacy stock=%s semantics separate from explicit preorder permission",
+    (stock) => {
+      const variant = {
+        id: "availability-fixture",
+        productId: "availability",
+        sku: "SAME-SKU",
+        size: "M",
+        color: "blue",
+        stock,
+        isActive: true,
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      };
+      for (const preorderEnabled of [undefined, false, true]) {
+        const result = toProductDto(
+          product("availability", categories[0]!, {
+            variants: [
+              {
+                ...variant,
+                ...(preorderEnabled === undefined ? {} : { preorderEnabled }),
+              },
+            ],
+          }),
+        );
+        expect(result.variants[0]).toEqual({
+          id: variant.id,
+          sku: variant.sku,
+          size: variant.size,
+          color: variant.color,
+          stock,
+          isAvailable: stock === null || stock > 0,
+          availability: {
+            IN_STOCK: {
+              quantity: stock,
+              available: stock !== null && stock > 0,
+            },
+            PREORDER: {
+              enabled: preorderEnabled ?? false,
+              checkoutEnabled: false,
+            },
+          },
+        });
+        expect(result.availableSizes).toEqual(
+          stock === null || stock > 0 ? ["M"] : [],
+        );
+        expect(result.price).toBe(850000);
+      }
+    },
+  );
   it("returns only active categories with both localizations", async () => {
     const app = createApp();
     const response = await app.inject({

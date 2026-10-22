@@ -836,6 +836,14 @@ export const models = {
   },
   ProductVariant: {
     fields: {
+      preorderEnabled: {
+        type: "Boolean",
+        optional: false,
+        id: false,
+        unique: false,
+        updated: false,
+        default: "false",
+      },
       id: {
         type: "String",
         optional: false,
