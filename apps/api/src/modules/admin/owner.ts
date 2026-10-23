@@ -12,6 +12,9 @@ type OwnerAction =
   | "PREORDER_ARRIVAL"
   | "FINAL_INVOICE"
   | "ORDER_CANCEL"
+  | "REFUND_REQUEST"
+  | "REFUND_READ"
+  | "REFUND_STOCK_RECONCILE"
   | "REFUND_CONFIRM";
 
 /** Server-only configuration. No default identity and no shared web-admin impersonation. */

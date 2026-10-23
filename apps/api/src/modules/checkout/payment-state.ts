@@ -7,7 +7,27 @@ export type CheckoutFinancialState = {
   userId: string;
   publicId: string;
   saleMode: "IN_STOCK" | "PREORDER";
-  orderState: "PAYMENTS_BLOCKED" | "CANCELLED";
+  orderState:
+    | "PAYMENTS_BLOCKED"
+    | "CANCELLED"
+    | "REFUND_REQUESTED"
+    | "CANCELLED_REFUNDED";
+  refundId: string | null;
+  refundStatus: "REQUESTED" | "COMPLETED" | null;
+  refundCompletedAt: number | null;
+  goodsRefunded: number;
+  cargoRefunded: number;
+  receivedTotal: number;
+  refundedTotal: number;
+  netGoodsReceived: number;
+  netCargoReceived: number;
+  netReceivedTotal: number;
+  stockReconciliationState:
+    | "NONE"
+    | "AWAITING_REFUND"
+    | "NOT_APPLICABLE"
+    | "REQUIRES_RECONCILIATION"
+    | "RELEASED";
   cancellationId: string | null;
   cancelledAt: number | null;
   paymentAllowed: 0 | 1;
@@ -46,6 +66,11 @@ export function assertCheckoutOpen(state: CheckoutFinancialState) {
     throw new HttpError(
       409,
       "Linked order cancelled; further financial actions are forbidden",
+    );
+  if (state.orderState !== "PAYMENTS_BLOCKED")
+    throw new HttpError(
+      409,
+      "Linked order locked by refund; further financial actions are forbidden",
     );
 }
 export async function readOrderFinance(orderId: string) {

@@ -735,3 +735,73 @@ model CheckoutStockRelease {
  createdAt DateTime
  @@index([orderId])
 }
+
+// 0025: full refund requests/allocations, outgoing ledger and independent stock reconciliation.
+model CheckoutRefund {
+ id String @id
+ orderId String @unique
+ reason String
+ createdBy String
+ createdAt DateTime
+ operationKey String
+ requestFingerprint String
+ goodsAmount Int
+ cargoAmount Int
+ totalAmount Int
+ financialSnapshot Json
+ sealed Boolean @default(false)
+ @@unique([id,orderId])
+ @@unique([createdBy,operationKey])
+}
+model CheckoutRefundAllocation {
+ id String @id
+ refundId String
+ orderId String
+ paymentLedgerId String @unique
+ goodsAmount Int
+ cargoAmount Int
+ @@index([refundId])
+}
+model CheckoutRefundLedger {
+ id String @id
+ refundId String @unique
+ orderId String @unique
+ goodsAmount Int
+ cargoAmount Int
+ totalAmount Int
+ currency String
+ confirmedBy String
+ confirmedAt DateTime
+ bankOperationDigest String @unique
+ operationKey String
+ requestFingerprint String
+ bankTransferVerified Boolean
+ @@unique([id,refundId,orderId])
+ @@unique([confirmedBy,operationKey])
+}
+model CheckoutRefundStockReconciliation {
+ id String @id
+ refundId String @unique
+ orderId String @unique
+ refundLedgerId String @unique
+ createdBy String
+ createdAt DateTime
+ operationKey String
+ requestFingerprint String
+ sealed Boolean @default(false)
+ @@unique([id,refundId,orderId])
+ @@unique([createdBy,operationKey])
+}
+model CheckoutRefundStockRelease {
+ id String @id
+ reconciliationId String
+ refundId String
+ orderId String
+ itemId String @unique
+ variantId String
+ quantity Int
+ stockBefore Int
+ stockAfter Int
+ createdAt DateTime
+ @@index([orderId])
+}

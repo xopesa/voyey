@@ -105,6 +105,11 @@ export class LinkedCheckoutCancellations {
           409,
           "Confirmed money requires the future refund process; cancellation denied",
         );
+      if (state.refundId)
+        throw new HttpError(
+          409,
+          "Refund lifecycle cannot use unpaid cancellation",
+        );
       if (
         await database()
           .prepare(
