@@ -57,6 +57,21 @@ export function toCartDto(cart: CartRecord, now = Date.now()): CartDto {
   });
   return {
     id: cart.id,
+    groups: Object.fromEntries(
+      (["IN_STOCK", "PREORDER"] as const).map((mode) => {
+        const selected = items.filter((item) => item.saleMode === mode);
+        return [
+          mode,
+          {
+            items: selected,
+            quantity: selected.reduce((n, i) => n + i.quantity, 0),
+            subtotal: selected.reduce((n, i) => n + i.lineTotal, 0),
+            checkoutEnabled: false as const,
+          },
+        ];
+      }),
+    ) as NonNullable<CartDto["groups"]>,
+    hasLegacyItems: items.some((item) => item.saleMode === "LEGACY"),
     items,
     subtotal: items.reduce((sum, item) => sum + item.lineTotal, 0),
     currency: "UZS",

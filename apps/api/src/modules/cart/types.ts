@@ -109,6 +109,16 @@ export interface CartItemDto {
 }
 
 export interface CartDto {
+  groups?: Record<
+    "IN_STOCK" | "PREORDER",
+    {
+      items: CartItemDto[];
+      quantity: number;
+      subtotal: number;
+      checkoutEnabled: false;
+    }
+  >;
+  hasLegacyItems?: boolean;
   id: string;
   items: CartItemDto[];
   subtotal: number;

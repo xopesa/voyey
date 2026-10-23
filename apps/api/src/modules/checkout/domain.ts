@@ -45,53 +45,13 @@ export function prepareOrderItems(
   if (cartItems.length === 0) throw new CheckoutEmptyCartError();
   assertLegacyCheckout(cartItems);
   const items = cartItems.map((item) => {
-    const required = item.product.category.requiresBuyerMeasurements !== false;
-    const validMeasurement = (
-      value: number | null | undefined,
-      min: number,
-      max: number,
-    ) =>
-      value != null && Number.isInteger(value) && value >= min && value <= max;
-    if (
-      ((required || item.heightCm != null) &&
-        !validMeasurement(item.heightCm, 100, 250)) ||
-      ((required || item.weightKg != null) &&
-        !validMeasurement(item.weightKg, 30, 300))
-    )
-      throw new CheckoutMeasurementsError();
     assertPurchasable(
       item.product,
       item.variant,
       item.productId,
       item.quantity,
     );
-    const unitPrice = effectiveProductPrice(item.product, now).effectivePrice;
-    const lineTotal = unitPrice * item.quantity;
-    if (!Number.isSafeInteger(lineTotal) || lineTotal > MAX_INT32) {
-      throw new CheckoutAmountLimitError();
-    }
-    return {
-      catalogSnapshot: createCatalogOrderItemSnapshot(
-        item.product.category,
-        item.product.attributes,
-        item.variant.attributes,
-      ),
-      productId: item.productId,
-      variantId: item.variantId,
-      productNameRu: item.product.nameRu,
-      productNameUz: item.product.nameUz,
-      productSlug: item.product.slug,
-      imageUrl: item.product.images[0]?.url ?? null,
-      sku: item.variant.sku,
-      size: item.variant.size,
-      color: item.variant.color,
-      originalUnitPrice: item.product.price,
-      unitPrice,
-      quantity: item.quantity,
-      lineTotal,
-      heightCm: item.heightCm ?? null,
-      weightKg: item.weightKg ?? null,
-    };
+    return snapshotCheckoutLine(item, now);
   });
   const subtotal = items.reduce((sum, item) => sum + item.lineTotal, 0);
   if (!Number.isSafeInteger(subtotal) || subtotal > MAX_INT32) {
@@ -107,5 +67,49 @@ export function prepareOrderItems(
     cargoAmount: null,
     cargoPaidAmount: 0,
     items,
+  };
+}
+
+/** Financially neutral historical line snapshot; caller validates sale availability. */
+export function snapshotCheckoutLine(item: CheckoutLine, now = Date.now()) {
+  const required = item.product.category.requiresBuyerMeasurements !== false;
+  const validMeasurement = (
+    value: number | null | undefined,
+    min: number,
+    max: number,
+  ) => value != null && Number.isInteger(value) && value >= min && value <= max;
+  if (
+    ((required || item.heightCm != null) &&
+      !validMeasurement(item.heightCm, 100, 250)) ||
+    ((required || item.weightKg != null) &&
+      !validMeasurement(item.weightKg, 30, 300))
+  )
+    throw new CheckoutMeasurementsError();
+  const unitPrice = effectiveProductPrice(item.product, now).effectivePrice;
+  const lineTotal = unitPrice * item.quantity;
+  if (!Number.isSafeInteger(lineTotal) || lineTotal > MAX_INT32) {
+    throw new CheckoutAmountLimitError();
+  }
+  return {
+    catalogSnapshot: createCatalogOrderItemSnapshot(
+      item.product.category,
+      item.product.attributes,
+      item.variant.attributes,
+    ),
+    productId: item.productId,
+    variantId: item.variantId,
+    productNameRu: item.product.nameRu,
+    productNameUz: item.product.nameUz,
+    productSlug: item.product.slug,
+    imageUrl: item.product.images[0]?.url ?? null,
+    sku: item.variant.sku,
+    size: item.variant.size,
+    color: item.variant.color,
+    originalUnitPrice: item.product.price,
+    unitPrice,
+    quantity: item.quantity,
+    lineTotal,
+    heightCm: item.heightCm ?? null,
+    weightKg: item.weightKg ?? null,
   };
 }
