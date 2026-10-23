@@ -9,6 +9,7 @@ const fields = (types: Record<string, string>) =>
 export const checkoutPaymentModels = {
   CheckoutPayment: {
     fields: fields({
+      invoiceId: "String",
       id: "String",
       orderId: "String",
       phase: "String",
@@ -36,6 +37,7 @@ export const checkoutPaymentModels = {
   },
   CheckoutPaymentLedger: {
     fields: fields({
+      invoiceId: "String",
       id: "String",
       paymentId: "String",
       orderId: "String",
@@ -48,6 +50,54 @@ export const checkoutPaymentModels = {
       verifiedAt: "DateTime",
       reviewKey: "String",
       reviewFingerprint: "String",
+    }),
+    relations: {},
+  },
+  CheckoutArrival: {
+    fields: fields({
+      id: "String",
+      orderId: "String",
+      arrivedAt: "DateTime",
+      itemSnapshot: "Json",
+      createdBy: "String",
+      createdAt: "DateTime",
+      operationKey: "String",
+      requestFingerprint: "String",
+    }),
+    relations: {},
+  },
+  CheckoutCargoCharge: {
+    fields: fields({
+      id: "String",
+      orderId: "String",
+      arrivalId: "String",
+      version: "Int",
+      amount: "Int",
+      createdBy: "String",
+      createdAt: "DateTime",
+      operationKey: "String",
+      requestFingerprint: "String",
+    }),
+    relations: {},
+  },
+  CheckoutFinalInvoice: {
+    fields: fields({
+      id: "String",
+      orderId: "String",
+      arrivalId: "String",
+      cargoChargeId: "String",
+      firstLedgerId: "String",
+      version: "Int",
+      currency: "String",
+      goodsTotal: "Int",
+      firstGoodsPaid: "Int",
+      goodsDue: "Int",
+      cargoDue: "Int",
+      totalDue: "Int",
+      createdBy: "String",
+      createdAt: "DateTime",
+      operationKey: "String",
+      requestFingerprint: "String",
     }),
     relations: {},
   },

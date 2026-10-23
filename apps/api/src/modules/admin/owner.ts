@@ -9,6 +9,8 @@ type OwnerAction =
   | "PAYMENT_PROOF_READ"
   | "PAYMENT_READ"
   | "CARGO_CHANGE"
+  | "PREORDER_ARRIVAL"
+  | "FINAL_INVOICE"
   | "REFUND_CONFIRM";
 
 /** Server-only configuration. No default identity and no shared web-admin impersonation. */

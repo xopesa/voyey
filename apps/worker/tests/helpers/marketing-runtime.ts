@@ -4,7 +4,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { Miniflare, Log, LogLevel, convertV4MiniflareOptions } from "miniflare";
 
-export async function marketingRuntime(commerce = "1") {
+export async function marketingRuntime(commerce = "1", through = "9999") {
   const salt = randomBytes(32).toString("hex"),
     proof = randomBytes(32).toString("hex");
   const botToken = "123456:" + randomBytes(32).toString("base64url");
@@ -47,17 +47,20 @@ export async function marketingRuntime(commerce = "1") {
     }),
   );
   const db = await mf.getD1Database("DB");
-  for (const file of readdirSync(
-    new URL("../../migrations/", import.meta.url),
-  ).sort())
-    for (const sql of readFileSync(
+  for (const file of readdirSync(new URL("../../migrations/", import.meta.url))
+    .filter((file) => file.slice(0, 4) <= through.slice(0, 4))
+    .sort()) {
+    const statements = readFileSync(
       new URL("../../migrations/" + file, import.meta.url),
       "utf8",
     )
       .split(/;\r?\n/)
       .map((v) => v.trim())
-      .filter(Boolean))
-      await db.prepare(sql).run();
+      .filter(Boolean);
+    if (file.startsWith("0023_"))
+      await db.batch(statements.map((sql) => db.prepare(sql)));
+    else for (const sql of statements) await db.prepare(sql).run();
+  }
   const base: Record<string, string> = {
     origin: "https://admin.preview.invalid",
     "x-stenzo-admin": "1",

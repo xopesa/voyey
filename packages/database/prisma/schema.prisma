@@ -616,6 +616,7 @@ model CheckoutPromoUse {
 
 // 0022 SQL owns constraints/FKs. CheckoutOrder remains the immutable initial contract.
 model CheckoutPayment {
+ invoiceId String?
  id String @id
  orderId String
  phase String @default("FIRST")
@@ -644,6 +645,7 @@ model CheckoutPayment {
  @@index([orderId,submittedAt,id])
 }
 model CheckoutPaymentLedger {
+ invoiceId String?
  id String @id
  paymentId String @unique
  orderId String
@@ -657,4 +659,51 @@ model CheckoutPaymentLedger {
  reviewKey String
  reviewFingerprint String
  @@unique([orderId,phase])
+}
+
+// 0023 owns FK/state invariants; these are immutable owner-confirmed snapshots.
+model CheckoutArrival {
+ id String @id
+ orderId String @unique
+ arrivedAt DateTime
+ itemSnapshot Json
+ createdBy String
+ createdAt DateTime
+ operationKey String
+ requestFingerprint String
+ @@unique([id,orderId])
+ @@unique([createdBy,operationKey])
+}
+model CheckoutCargoCharge {
+ id String @id
+ orderId String @unique
+ arrivalId String @unique
+ version Int
+ amount Int
+ createdBy String
+ createdAt DateTime
+ operationKey String
+ requestFingerprint String
+ @@unique([id,orderId])
+ @@unique([createdBy,operationKey])
+}
+model CheckoutFinalInvoice {
+ id String @id
+ orderId String @unique
+ arrivalId String
+ cargoChargeId String @unique
+ firstLedgerId String @unique
+ version Int
+ currency String
+ goodsTotal Int
+ firstGoodsPaid Int
+ goodsDue Int
+ cargoDue Int
+ totalDue Int
+ createdBy String
+ createdAt DateTime
+ operationKey String
+ requestFingerprint String
+ @@unique([id,orderId])
+ @@unique([createdBy,operationKey])
 }

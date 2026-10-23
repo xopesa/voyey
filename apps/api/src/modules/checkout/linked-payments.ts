@@ -10,7 +10,11 @@ import {
 } from "../media/image-validation.js";
 import { idempotencyKeySchema } from "../orders/schemas.js";
 import type { ManualPaymentConfig } from "../payments/service.js";
-import { readOrderFinance } from "./payment-state.js";
+import {
+  readOrderFinance,
+  type CheckoutFinancialState,
+} from "./payment-state.js";
+import type { FinalInvoiceRow } from "./preorder-finance.js";
 
 const amount = z.number().int().min(1).max(2147483647);
 const claimSchema = z.object({ declaredAmount: amount }).strict();
@@ -62,7 +66,7 @@ function bankDigest(reference: string) {
 }
 
 /** No HTTP routes, env enable switch, Telegram calls or external storage writes.
- * Full first installment only. Final PREORDER payment, CARGO and fulfillment stay blocked. */
+ * One full payment per phase. FINAL requires an immutable PREORDER invoice; fulfillment stays blocked. */
 export class LinkedCheckoutPayments {
   private readonly media = new D1MediaBucket(true);
   constructor(
@@ -106,6 +110,7 @@ export class LinkedCheckoutPayments {
         id: p.id,
         orderId: p.orderId,
         phase: p.phase,
+        ...(p.phase === "FINAL" ? { invoiceId: p.invoiceId } : {}),
         source: p.source,
         status: p.status,
         declaredAmount: p.declaredAmount,
@@ -136,19 +141,69 @@ export class LinkedCheckoutPayments {
     return outcome.result!;
   }
   async instructions(authorization: string | undefined, orderId: string) {
-    const state = await this.state(authorization, orderId);
-    if (!state.firstPaymentDue)
+    return this.phaseInstructions(authorization, orderId, "FIRST");
+  }
+  async finalInstructions(authorization: string | undefined, orderId: string) {
+    return this.phaseInstructions(authorization, orderId, "FINAL");
+  }
+  private async obligation(
+    state: CheckoutFinancialState,
+    phase: "FIRST" | "FINAL",
+  ) {
+    if (phase === "FIRST") {
+      if (!state.firstPaymentDue)
+        throw new HttpError(
+          409,
+          "First payment already confirmed; subsequent payments disabled",
+        );
+      return {
+        amount: state.firstPaymentDue,
+        invoiceId: null,
+        goodsAmount: state.firstPaymentDue,
+        cargoAmount: 0,
+      };
+    }
+    if (
+      state.saleMode !== "PREORDER" ||
+      !state.finalInvoiceId ||
+      state.finalDue === null ||
+      state.finalDue <= 0
+    )
       throw new HttpError(
         409,
-        "First payment already confirmed; subsequent payments disabled",
+        "Final payment requires a positive issued PREORDER invoice",
       );
+    const invoice = await database()
+      .prepare("SELECT * FROM CheckoutFinalInvoice WHERE id=? AND orderId=?")
+      .bind(state.finalInvoiceId, state.orderId)
+      .first<FinalInvoiceRow>();
+    if (!invoice || invoice.totalDue !== state.finalDue)
+      throw new HttpError(409, "Final invoice obligation mismatch");
+    return {
+      amount: invoice.totalDue,
+      invoiceId: invoice.id,
+      goodsAmount: invoice.goodsDue,
+      cargoAmount: invoice.cargoDue,
+    };
+  }
+  private async phaseInstructions(
+    authorization: string | undefined,
+    orderId: string,
+    phase: "FIRST" | "FINAL",
+  ) {
+    this.gate();
+    const subject = await this.subject(authorization);
+    const { state, due } = await atomic(async () => {
+      const state = await this.buyer(subject, orderId);
+      return { state, due: await this.obligation(state, phase) };
+    });
     if (!this.card?.cardNumber.trim() || !this.card.cardHolder.trim())
       throw new HttpError(503, "Independent VOYEY card is not configured");
     return {
       orderId,
       publicId: state.publicId,
-      phase: "FIRST" as const,
-      amount: state.firstPaymentDue,
+      phase,
+      amount: due.amount,
       currency: "UZS" as const,
       cardNumber: this.card.cardNumber,
       cardHolder: this.card.cardHolder,
@@ -162,6 +217,25 @@ export class LinkedCheckoutPayments {
     key: string,
     claim: unknown,
     proof: { data: Buffer; declaredMimeType: string },
+  ) {
+    return this.submitPhase(authorization, orderId, key, claim, proof, "FIRST");
+  }
+  async submitFinal(
+    authorization: string | undefined,
+    orderId: string,
+    key: string,
+    claim: unknown,
+    proof: { data: Buffer; declaredMimeType: string },
+  ) {
+    return this.submitPhase(authorization, orderId, key, claim, proof, "FINAL");
+  }
+  private async submitPhase(
+    authorization: string | undefined,
+    orderId: string,
+    key: string,
+    claim: unknown,
+    proof: { data: Buffer; declaredMimeType: string },
+    phase: "FIRST" | "FINAL",
   ) {
     this.gate();
     const userId = await this.subject(authorization);
@@ -178,7 +252,7 @@ export class LinkedCheckoutPayments {
     const fingerprint = hash(
       JSON.stringify({
         orderId,
-        phase: "FIRST",
+        phase,
         source: "WEBSITE",
         declaredAmount: data.declaredAmount,
         mime,
@@ -200,25 +274,20 @@ export class LinkedCheckoutPayments {
           throw new HttpError(409, "Incompatible receipt key reuse");
         return old.id;
       }
-      if (!state.firstPaymentDue)
-        throw new HttpError(
-          409,
-          "First payment already confirmed; subsequent payments disabled",
-        );
+      const due = await this.obligation(state, phase);
       if (
         await database()
           .prepare(
-            "SELECT id FROM CheckoutPayment WHERE orderId=? AND status='SUBMITTED'",
+            "SELECT id FROM CheckoutPayment WHERE orderId=? AND phase=? AND status='SUBMITTED'",
           )
-          .bind(orderId)
+          .bind(orderId, phase)
           .first()
       )
         throw new HttpError(409, "Receipt already pending review");
       this.media.putInBatch(b, storageKey, bytes, {
         httpMetadata: { contentType: mime },
       });
-      b.sql(
-        "INSERT INTO CheckoutPayment(id,orderId,source,submittedBy,attachedBy,submitKey,submitFingerprint,declaredAmount,expectedAmount,proofStorageKey,proofMimeType,proofSize,proofSha256,submittedAt) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+      const values: unknown[] = [
         id,
         orderId,
         "WEBSITE",
@@ -227,19 +296,26 @@ export class LinkedCheckoutPayments {
         key,
         fingerprint,
         data.declaredAmount,
-        state.firstPaymentDue,
+        due.amount,
         storageKey,
         mime,
         bytes.length,
         proofSha256,
         Date.now(),
+      ];
+      const columns =
+        "id,orderId,source,submittedBy,attachedBy,submitKey,submitFingerprint,declaredAmount,expectedAmount,proofStorageKey,proofMimeType,proofSize,proofSha256,submittedAt";
+      if (phase === "FINAL") values.push(phase, due.invoiceId);
+      b.sql(
+        `INSERT INTO CheckoutPayment(${columns}${phase === "FINAL" ? ",phase,invoiceId" : ""}) VALUES(${values.map(() => "?").join(",")})`,
+        ...values,
       );
       b.insert("AuditLog", {
         actorId: userId,
         action: "linked-payment.submitted",
         entityType: "CheckoutPayment",
         entityId: id,
-        metadata: { orderId, source: "WEBSITE" },
+        metadata: { orderId, source: "WEBSITE", phase },
       });
       return id;
     });
@@ -253,8 +329,7 @@ export class LinkedCheckoutPayments {
   ) {
     this.gate();
     key = parsed(idempotencyKeySchema, key);
-    const data = parsed(reviewSchema, value),
-      subject = await this.owner.identify(authorization);
+    const data = parsed(reviewSchema, value);
     const operationDigest =
       data.decision === "APPROVE"
         ? bankDigest(data.bankOperationReference)
@@ -271,7 +346,7 @@ export class LinkedCheckoutPayments {
     const outcome = await atomic(async (b) => {
       const authority = await this.owner.inspect(
         b,
-        subject,
+        await this.owner.identify(authorization),
         data.decision === "APPROVE" ? "PAYMENT_CONFIRM" : "PAYMENT_REJECT",
       );
       if (authority.reason !== "AUTHORIZED") return { denied: authority };
@@ -295,17 +370,23 @@ export class LinkedCheckoutPayments {
           .first()
       )
         throw new HttpError(409, "Review key already used");
-      if (state.firstPaymentDue !== p.expectedAmount)
-        throw new HttpError(409, "First payment obligation changed");
+      if (p.phase !== "FIRST" && p.phase !== "FINAL")
+        throw new HttpError(409, "Unsupported payment phase");
+      const due = await this.obligation(state, p.phase);
+      if (
+        due.amount !== p.expectedAmount ||
+        (p.phase === "FINAL" && due.invoiceId !== p.invoiceId)
+      )
+        throw new HttpError(409, "Payment obligation changed");
       const now = Math.max(Date.now(), p.submittedAt);
       if (data.decision === "APPROVE") {
         if (
           data.confirmedAmount !== p.expectedAmount ||
-          data.confirmedAmount !== state.firstPaymentDue
+          data.confirmedAmount !== due.amount
         )
           throw new HttpError(
             409,
-            "Confirm exactly the first payment obligation; overpayment/partial payment denied",
+            "Confirm exactly the payment obligation; overpayment/partial payment denied",
           );
         if (
           await database()
@@ -316,19 +397,25 @@ export class LinkedCheckoutPayments {
             .first()
         )
           throw new HttpError(409, "Bank transfer already credited");
-        b.sql(
-          "INSERT INTO CheckoutPaymentLedger(id,paymentId,orderId,phase,kind,goodsAmount,bankOperationDigest,verifiedBy,verifiedAt,reviewKey,reviewFingerprint) VALUES(?,?,?,?,?,?,?,?,?,?,?)",
+        const values: unknown[] = [
           randomUUID(),
           p.id,
           p.orderId,
-          "FIRST",
+          p.phase,
           "MANUAL_CARD_TRANSFER",
-          data.confirmedAmount,
+          due.goodsAmount,
           operationDigest,
           authority.userId,
           now,
           key,
           fingerprint,
+        ];
+        const columns =
+          "id,paymentId,orderId,phase,kind,goodsAmount,bankOperationDigest,verifiedBy,verifiedAt,reviewKey,reviewFingerprint";
+        if (p.phase === "FINAL") values.push(due.cargoAmount, due.invoiceId);
+        b.sql(
+          `INSERT INTO CheckoutPaymentLedger(${columns}${p.phase === "FINAL" ? ",cargoAmount,invoiceId" : ""}) VALUES(${values.map(() => "?").join(",")})`,
+          ...values,
         );
       } else {
         b.sql(
@@ -351,7 +438,7 @@ export class LinkedCheckoutPayments {
         entityId: p.id,
         metadata: {
           orderId: p.orderId,
-          phase: "FIRST",
+          phase: p.phase,
           ...(data.decision === "REJECT" ? { reason: data.reason } : {}),
         },
       });

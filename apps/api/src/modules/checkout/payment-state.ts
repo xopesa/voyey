@@ -16,11 +16,27 @@ export type CheckoutFinancialState = {
   firstPaymentState:
     "AWAITING_PAYMENT" | "PENDING_REVIEW" | "REJECTED" | "CONFIRMED";
   goodsPaymentState: "UNPAID" | "PARTIALLY_PAID" | "PAID";
-  cargoAmount: null;
-  cargoPaid: 0;
+  cargoAmount: number | null;
+  cargoPaid: number;
+  unpaidCargo: number | null;
+  arrivalId: string | null;
+  arrivedAt: number | null;
+  cargoChargeId: string | null;
+  cargoVersion: number | null;
+  finalInvoiceId: string | null;
+  finalInvoiceTotal: number | null;
+  finalDue: number | null;
+  finalPaymentState:
+    | "UNAVAILABLE"
+    | "AWAITING_PAYMENT"
+    | "PENDING_REVIEW"
+    | "REJECTED"
+    | "CONFIRMED"
+    | "SETTLED_ZERO";
+  financiallySettled: 0 | 1;
   fulfillmentAllowed: 0;
-  finalPaymentEnabled: 0;
-  cargoEnabled: 0;
+  finalPaymentEnabled: 0 | 1;
+  cargoEnabled: 0 | 1;
 };
 export async function readOrderFinance(orderId: string) {
   const state = await database()
