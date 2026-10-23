@@ -1,3 +1,4 @@
+import { assertNoCheckoutGroupKey } from "../checkout/group-store.js";
 import { atomic, prisma } from "@stenzo/database";
 import { z } from "zod";
 import type { FastifyInstance, FastifyRequest } from "fastify";
@@ -102,6 +103,7 @@ export class ManualOrderService {
     const input = parseManualOrder(value),
       publicId = createPublicOrderId();
     const result = await atomic(async (batch) => {
+      await assertNoCheckoutGroupKey(input.userId, parsedKey.data);
       // Historical replay precedes current user/product/promo validation.
       const existing = await prisma.order.findUnique({
         where: {

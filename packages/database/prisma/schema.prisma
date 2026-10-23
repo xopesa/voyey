@@ -552,3 +552,64 @@ model PromoCodeRedemption {
   @@index([userId])
   @@index([createdAt])
 }
+
+// Isolated linked-order contracts. Foreign keys and immutable quarantine are enforced by D1 0021.
+model CheckoutGroup {
+ id String @id
+ userId String
+ idempotencyKey String
+ requestFingerprint String
+ recipient Json
+ goodsSubtotal Int
+ discountAmount Int
+ goodsTotal Int
+ sealed Boolean @default(false)
+ createdAt DateTime
+ @@unique([userId,idempotencyKey])
+ @@unique([id,userId])
+}
+model CheckoutOrder {
+ id String @id
+ publicId String @unique
+ checkoutGroupId String
+ saleMode String
+ state String @default("PAYMENTS_BLOCKED")
+ financialPolicy Json
+ goodsSubtotal Int
+ discountAmount Int
+ goodsTotal Int
+ prepaymentPercent Int
+ firstPaymentAmount Int
+ remainingAfterFirst Int
+ goodsPaid Int @default(0)
+ unpaidGoods Int
+ cargoAmount Int?
+ cargoPaid Int @default(0)
+ createdAt DateTime
+ @@unique([checkoutGroupId,saleMode])
+ @@unique([id,saleMode])
+}
+model CheckoutOrderItem {
+ id String @id
+ orderId String
+ saleMode String
+ cartItemId String
+ productId String
+ variantId String
+ quantity Int
+ unitPrice Int
+ lineTotal Int
+ inventoryReservedQuantity Int
+ snapshot Json
+ createdAt DateTime
+ @@unique([orderId,variantId])
+}
+model CheckoutPromoUse {
+ id String @id
+ checkoutGroupId String @unique
+ userId String
+ promoCodeId String
+ discountAmount Int
+ releasedAt DateTime?
+ createdAt DateTime
+}

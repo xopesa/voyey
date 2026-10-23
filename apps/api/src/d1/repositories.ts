@@ -1,3 +1,4 @@
+import { assertNoCheckoutGroupKey } from "../modules/checkout/group-store.js";
 import { adminPrincipalHash } from "./principal.js";
 import {
   categoryDefinitions,
@@ -396,6 +397,7 @@ export class D1OrderRepository extends PrismaOrderRepository {
   }
   override async checkout(input: CheckoutWriteInput) {
     const result = await atomic(async (batch) => {
+      await assertNoCheckoutGroupKey(input.userId, input.idempotencyKey);
       const existing = await prisma.order.findUnique({
         where: {
           userId_idempotencyKey: {

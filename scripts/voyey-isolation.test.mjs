@@ -35,6 +35,7 @@ test("even the env example cannot inject credentials or origins into Wrangler", 
   const text = readFileSync(join(root, ".env.example"), "utf8");
   for (const change of [
     text.replace("JWT_SECRET=", "JWT_SECRET=synthetic"),
+    text.replace("VOYEY_OWNER_TELEGRAM_ID=", "VOYEY_OWNER_TELEGRAM_ID=1001"),
     text + "\nCLOUDFLARE_API_TOKEN=synthetic\n",
     text + "\nJWT_SECRET=\n",
     text.replace("COMMERCE_ENABLED=0", "COMMERCE_ENABLED=1"),
@@ -137,7 +138,9 @@ test("local runner rejects deploy, remote mode, alternate config and forwarded a
   assert.ok(localArguments("dev").includes("--local"));
   assert.ok(localArguments("dev").includes("--remote=false"));
   assert.ok(localArguments("dev").includes("--tunnel=false"));
-  assert.ok(localArguments("dev").includes("--show-interactive-dev-session=false"));
+  assert.ok(
+    localArguments("dev").includes("--show-interactive-dev-session=false"),
+  );
   for (const mode of ["deploy", "secret", "d1", undefined])
     assert.throws(() => localArguments(mode));
   for (const args of [

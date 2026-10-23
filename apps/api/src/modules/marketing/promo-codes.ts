@@ -1,4 +1,4 @@
-import { atomic, prisma } from "@stenzo/database";
+import { atomic, prisma, database } from "@stenzo/database";
 import {
   cartSnapshotVersion,
   type PromoCartQuote,
@@ -46,6 +46,20 @@ export function parsePromo(value: unknown) {
   if (!result.success) throw new HttpError(400, "promoInvalidSettings");
   return { ...result.data, code: result.data.code! };
 }
+async function usage(promoCodeId: string, userId?: string) {
+  const legacy = await prisma.promoCodeRedemption.count({
+    where: { promoCodeId, releasedAt: null, ...(userId ? { userId } : {}) },
+  });
+  const linked = await database()
+    .prepare(
+      "SELECT COUNT(*) n FROM CheckoutPromoUse WHERE promoCodeId=? AND releasedAt IS NULL" +
+        (userId ? " AND userId=?" : ""),
+    )
+    .bind(promoCodeId, ...(userId ? [userId] : []))
+    .first<{ n: number }>();
+  return legacy + linked!.n;
+}
+
 type PromoRecord = Awaited<
   ReturnType<typeof prisma.promoCode.findUniqueOrThrow>
 >;
@@ -64,9 +78,7 @@ async function dto(p: PromoRecord): Promise<AdminPromoCode> {
     isActive: p.isActive,
     createdAt: p.createdAt.toISOString(),
     updatedAt: p.updatedAt.toISOString(),
-    usageCount: await prisma.promoCodeRedemption.count({
-      where: { promoCodeId: p.id, releasedAt: null },
-    }),
+    usageCount: await usage(p.id),
   };
 }
 export class PromoCodeService {
@@ -180,18 +192,9 @@ export async function promoForCheckout(
     return fail("PROMO_EXPIRED");
   if (promo.minOrderAmount != null && subtotal < promo.minOrderAmount)
     return fail("PROMO_MINIMUM");
-  if (
-    promo.usageLimit != null &&
-    (await prisma.promoCodeRedemption.count({
-      where: { promoCodeId: promo.id, releasedAt: null },
-    })) >= promo.usageLimit
-  )
+  if (promo.usageLimit != null && (await usage(promo.id)) >= promo.usageLimit)
     return fail("PROMO_LIMIT");
-  if (
-    (await prisma.promoCodeRedemption.count({
-      where: { promoCodeId: promo.id, userId, releasedAt: null },
-    })) >= promo.perUserLimit
-  )
+  if ((await usage(promo.id, userId)) >= promo.perUserLimit)
     return fail("PROMO_USER_LIMIT");
   const discountAmount = promoDiscount(promo, subtotal);
   if (discountAmount == null) return fail("PROMO_AMOUNT");
