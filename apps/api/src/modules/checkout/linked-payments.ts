@@ -12,6 +12,7 @@ import { idempotencyKeySchema } from "../orders/schemas.js";
 import type { ManualPaymentConfig } from "../payments/service.js";
 import {
   readOrderFinance,
+  assertCheckoutOpen,
   type CheckoutFinancialState,
 } from "./payment-state.js";
 import type { FinalInvoiceRow } from "./preorder-finance.js";
@@ -150,6 +151,7 @@ export class LinkedCheckoutPayments {
     state: CheckoutFinancialState,
     phase: "FIRST" | "FINAL",
   ) {
+    assertCheckoutOpen(state);
     if (phase === "FIRST") {
       if (!state.firstPaymentDue)
         throw new HttpError(
@@ -263,6 +265,7 @@ export class LinkedCheckoutPayments {
       storageKey = `payment-proofs/${id}.${imageExtensionByMimeType[mime]}`;
     const paymentId = await atomic(async (b) => {
       const state = await this.buyer(userId, orderId);
+      assertCheckoutOpen(state);
       const old = await database()
         .prepare(
           "SELECT id,submitFingerprint FROM CheckoutPayment WHERE submittedBy=? AND submitKey=?",
@@ -352,6 +355,7 @@ export class LinkedCheckoutPayments {
       if (authority.reason !== "AUTHORIZED") return { denied: authority };
       const p = await this.payment(paymentId),
         state = await readOrderFinance(p.orderId);
+      assertCheckoutOpen(state);
       if (p.status !== "SUBMITTED") {
         if (
           p.reviewKey !== key ||

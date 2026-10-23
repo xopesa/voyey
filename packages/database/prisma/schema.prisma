@@ -707,3 +707,31 @@ model CheckoutFinalInvoice {
  @@unique([id,orderId])
  @@unique([createdBy,operationKey])
 }
+
+// 0024: immutable cancellation + exactly-once release; original orders stay unchanged.
+model CheckoutCancellation {
+ id String @id
+ orderId String @unique
+ reason String
+ createdBy String
+ createdAt DateTime
+ operationKey String
+ requestFingerprint String
+ financialSnapshot Json
+ reservationSnapshot Json
+ sealed Boolean @default(false)
+ @@unique([id,orderId])
+ @@unique([createdBy,operationKey])
+}
+model CheckoutStockRelease {
+ id String @id
+ cancellationId String
+ orderId String
+ itemId String @unique
+ variantId String
+ quantity Int
+ stockBefore Int
+ stockAfter Int
+ createdAt DateTime
+ @@index([orderId])
+}

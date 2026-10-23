@@ -7,7 +7,10 @@ export type CheckoutFinancialState = {
   userId: string;
   publicId: string;
   saleMode: "IN_STOCK" | "PREORDER";
-  orderState: "PAYMENTS_BLOCKED";
+  orderState: "PAYMENTS_BLOCKED" | "CANCELLED";
+  cancellationId: string | null;
+  cancelledAt: number | null;
+  paymentAllowed: 0 | 1;
   goodsTotal: number;
   firstPaymentAmount: number;
   goodsPaid: number;
@@ -38,6 +41,13 @@ export type CheckoutFinancialState = {
   finalPaymentEnabled: 0 | 1;
   cargoEnabled: 0 | 1;
 };
+export function assertCheckoutOpen(state: CheckoutFinancialState) {
+  if (state.orderState === "CANCELLED")
+    throw new HttpError(
+      409,
+      "Linked order cancelled; further financial actions are forbidden",
+    );
+}
 export async function readOrderFinance(orderId: string) {
   const state = await database()
     .prepare("SELECT * FROM CheckoutOrderFinance WHERE orderId=?")

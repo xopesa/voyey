@@ -11,6 +11,7 @@ type OwnerAction =
   | "CARGO_CHANGE"
   | "PREORDER_ARRIVAL"
   | "FINAL_INVOICE"
+  | "ORDER_CANCEL"
   | "REFUND_CONFIRM";
 
 /** Server-only configuration. No default identity and no shared web-admin impersonation. */

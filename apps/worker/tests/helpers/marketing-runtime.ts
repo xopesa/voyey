@@ -57,7 +57,7 @@ export async function marketingRuntime(commerce = "1", through = "9999") {
       .split(/;\r?\n/)
       .map((v) => v.trim())
       .filter(Boolean);
-    if (file.startsWith("0023_"))
+    if (file.slice(0, 4) >= "0023")
       await db.batch(statements.map((sql) => db.prepare(sql)));
     else for (const sql of statements) await db.prepare(sql).run();
   }

@@ -7,6 +7,35 @@ const fields = (types: Record<string, string>) =>
     ]),
   );
 export const checkoutPaymentModels = {
+  CheckoutCancellation: {
+    fields: fields({
+      id: "String",
+      orderId: "String",
+      reason: "String",
+      createdBy: "String",
+      createdAt: "DateTime",
+      operationKey: "String",
+      requestFingerprint: "String",
+      financialSnapshot: "Json",
+      reservationSnapshot: "Json",
+      sealed: "Boolean",
+    }),
+    relations: {},
+  },
+  CheckoutStockRelease: {
+    fields: fields({
+      id: "String",
+      cancellationId: "String",
+      orderId: "String",
+      itemId: "String",
+      variantId: "String",
+      quantity: "Int",
+      stockBefore: "Int",
+      stockAfter: "Int",
+      createdAt: "DateTime",
+    }),
+    relations: {},
+  },
   CheckoutPayment: {
     fields: fields({
       invoiceId: "String",

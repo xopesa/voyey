@@ -12,7 +12,7 @@ export function isolatedD1(through = "9999") {
       new URL("../../migrations/" + file, import.meta.url),
       "utf8",
     );
-    if (file.startsWith("0023_")) {
+    if (file.slice(0, 4) >= "0023") {
       sqlite.exec("BEGIN IMMEDIATE");
       try {
         sqlite.exec(sql);

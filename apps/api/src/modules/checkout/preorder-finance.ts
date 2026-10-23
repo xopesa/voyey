@@ -5,7 +5,7 @@ import { VoyeyOwnerAuthority } from "../admin/owner.js";
 import { HttpError } from "../auth/errors.js";
 import { idempotencyKeySchema } from "../orders/schemas.js";
 import { calculateOutstanding, type GroupFinance } from "./finance.js";
-import { readOrderFinance } from "./payment-state.js";
+import { readOrderFinance, assertCheckoutOpen } from "./payment-state.js";
 
 const arrivalSchema = z
   .object({
@@ -92,6 +92,7 @@ export class PreorderFinance {
   }
   private async preorder(orderId: string) {
     const state = await readOrderFinance(orderId);
+    assertCheckoutOpen(state);
     if (state.saleMode !== "PREORDER")
       throw new HttpError(
         409,
