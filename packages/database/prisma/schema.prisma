@@ -521,6 +521,7 @@ enum PromoCodeType {
   FIXED
 }
 model PromoCode {
+  engineVersion Int @default(1)
   id String @id @default(cuid())
   code String @unique
   type PromoCodeType
@@ -804,4 +805,41 @@ model CheckoutRefundStockRelease {
  stockAfter Int
  createdAt DateTime
  @@index([orderId])
+}
+
+// 0026: compatible settings for existing PromoCode identity, no new usage lifecycle.
+model PromoCampaign {
+ id String @id
+ campaignKey String @unique
+ name String
+ createdBy String
+ createdAt DateTime
+}
+model PromoCodePolicy {
+ promoCodeId String @id
+ saleModes String
+ audience String
+ purpose String
+ personalUserId String?
+ campaignId String?
+ scope String
+ createdBy String
+ createdAt DateTime
+ sealed Boolean @default(false)
+}
+model PromoPolicyCategory {
+ promoCodeId String
+ categoryId String
+ @@id([promoCodeId,categoryId])
+}
+model PromoPolicyProduct {
+ promoCodeId String
+ productId String
+ @@id([promoCodeId,productId])
+}
+model PromoPolicyExclusion {
+ promoCodeId String
+ productId String
+ saleModes String
+ @@id([promoCodeId,productId,saleModes])
 }

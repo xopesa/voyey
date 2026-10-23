@@ -46,7 +46,7 @@ export function parsePromo(value: unknown) {
   if (!result.success) throw new HttpError(400, "promoInvalidSettings");
   return { ...result.data, code: result.data.code! };
 }
-async function usage(promoCodeId: string, userId?: string) {
+export async function promoUsage(promoCodeId: string, userId?: string) {
   const legacy = await prisma.promoCodeRedemption.count({
     where: { promoCodeId, releasedAt: null, ...(userId ? { userId } : {}) },
   });
@@ -78,7 +78,7 @@ async function dto(p: PromoRecord): Promise<AdminPromoCode> {
     isActive: p.isActive,
     createdAt: p.createdAt.toISOString(),
     updatedAt: p.updatedAt.toISOString(),
-    usageCount: await usage(p.id),
+    usageCount: await promoUsage(p.id),
   };
 }
 export class PromoCodeService {
@@ -86,11 +86,14 @@ export class PromoCodeService {
     const records = await prisma.promoCode.findMany({
       orderBy: [{ createdAt: "desc" }, { id: "asc" }],
     });
-    return Promise.all(records.map(dto));
+    return Promise.all(
+      records.filter((p) => (p.engineVersion ?? 1) === 1).map(dto),
+    );
   }
   private async get(id: string) {
     const row = await prisma.promoCode.findUnique({ where: { id } });
-    if (!row) throw new HttpError(404, "notFound");
+    if (!row || (row.engineVersion ?? 1) !== 1)
+      throw new HttpError(404, "notFound");
     return row;
   }
   async save(actor: string, input: unknown, id?: string) {
@@ -184,7 +187,7 @@ export async function promoForCheckout(
   const code = normalizePromoCode(value);
   if (!code) return fail("PROMO_INVALID");
   const promo = await prisma.promoCode.findUnique({ where: { code } });
-  if (!promo) return fail("PROMO_INVALID");
+  if (!promo || (promo.engineVersion ?? 1) !== 1) return fail("PROMO_INVALID");
   if (!promo.isActive) return fail("PROMO_INACTIVE");
   if (promo.startsAt && now < promo.startsAt.getTime())
     return fail("PROMO_NOT_STARTED");
@@ -192,9 +195,12 @@ export async function promoForCheckout(
     return fail("PROMO_EXPIRED");
   if (promo.minOrderAmount != null && subtotal < promo.minOrderAmount)
     return fail("PROMO_MINIMUM");
-  if (promo.usageLimit != null && (await usage(promo.id)) >= promo.usageLimit)
+  if (
+    promo.usageLimit != null &&
+    (await promoUsage(promo.id)) >= promo.usageLimit
+  )
     return fail("PROMO_LIMIT");
-  if ((await usage(promo.id, userId)) >= promo.perUserLimit)
+  if ((await promoUsage(promo.id, userId)) >= promo.perUserLimit)
     return fail("PROMO_USER_LIMIT");
   const discountAmount = promoDiscount(promo, subtotal);
   if (discountAmount == null) return fail("PROMO_AMOUNT");

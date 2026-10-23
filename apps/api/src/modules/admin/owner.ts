@@ -15,7 +15,8 @@ type OwnerAction =
   | "REFUND_REQUEST"
   | "REFUND_READ"
   | "REFUND_STOCK_RECONCILE"
-  | "REFUND_CONFIRM";
+  | "REFUND_CONFIRM"
+  | "PROMO_CONFIGURE";
 
 /** Server-only configuration. No default identity and no shared web-admin impersonation. */
 export class VoyeyOwnerAuthority {
