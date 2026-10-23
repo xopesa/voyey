@@ -1,9 +1,10 @@
-import { database, type prisma } from "@stenzo/database";
+import { atomic, database, type prisma } from "@stenzo/database";
 import { HttpError } from "../auth/errors.js";
 import type { GroupFinance } from "./finance.js";
 import type { SplitCheckoutPlan } from "./split-plan.js";
 import type { z } from "zod";
 import type { recipientSchema } from "../orders/schemas.js";
+import { readOrderFinance } from "./payment-state.js";
 
 type GroupRow = Omit<
   Awaited<ReturnType<typeof prisma.checkoutGroup.findUniqueOrThrow>>,
@@ -30,6 +31,9 @@ export async function assertNoCheckoutGroupKey(userId: string, key: string) {
     throw new HttpError(409, "Idempotency key belongs to linked checkout");
 }
 export async function readCheckoutGroup(userId: string, id: string) {
+  return atomic(() => readGroupSnapshot(userId, id));
+}
+async function readGroupSnapshot(userId: string, id: string) {
   const group = await database()
     .prepare("SELECT * FROM CheckoutGroup WHERE id=? AND userId=? AND sealed=1")
     .bind(id, userId)
@@ -49,6 +53,8 @@ export async function readCheckoutGroup(userId: string, id: string) {
     orders: await Promise.all(
       orders.map(async (order) => ({
         ...order,
+        // The 0021 row is the immutable creation contract; expose current ledger money.
+        ...(await readOrderFinance(order.id)),
         financialPolicy: JSON.parse(order.financialPolicy) as GroupFinance & {
           version: 1;
         },

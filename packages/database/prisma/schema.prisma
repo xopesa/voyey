@@ -613,3 +613,48 @@ model CheckoutPromoUse {
  releasedAt DateTime?
  createdAt DateTime
 }
+
+// 0022 SQL owns constraints/FKs. CheckoutOrder remains the immutable initial contract.
+model CheckoutPayment {
+ id String @id
+ orderId String
+ phase String @default("FIRST")
+ source String
+ submittedBy String
+ attachedBy String
+ submitKey String
+ submitFingerprint String
+ declaredAmount Int
+ expectedAmount Int
+ confirmedAmount Int @default(0)
+ proofStorageKey String @unique
+ proofMimeType String
+ proofSize Int
+ proofSha256 String
+ status String @default("SUBMITTED")
+ submittedAt DateTime
+ reviewedBy String?
+ reviewedAt DateTime?
+ reviewKey String?
+ reviewFingerprint String?
+ rejectionReason String?
+ @@unique([id,orderId])
+ @@unique([submittedBy,submitKey])
+ @@unique([reviewedBy,reviewKey])
+ @@index([orderId,submittedAt,id])
+}
+model CheckoutPaymentLedger {
+ id String @id
+ paymentId String @unique
+ orderId String
+ phase String
+ kind String
+ goodsAmount Int
+ cargoAmount Int @default(0)
+ bankOperationDigest String @unique
+ verifiedBy String
+ verifiedAt DateTime
+ reviewKey String
+ reviewFingerprint String
+ @@unique([orderId,phase])
+}

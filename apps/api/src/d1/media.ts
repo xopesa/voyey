@@ -1,4 +1,4 @@
-import { database } from "@stenzo/database";
+import { database, type Batch } from "@stenzo/database";
 import type { Bucket } from "./runtime.js";
 import {
   InvalidStorageKeyError,
@@ -13,7 +13,7 @@ export class D1MediaBucket implements Bucket {
       : /^products\/[a-zA-Z0-9_-]+\.(png|jpe?g|webp)$/;
     if (!pattern.test(key)) throw new InvalidStorageKeyError();
   }
-  async put(
+  private putStatements(
     key: string,
     data: Uint8Array,
     options: { httpMetadata: { contentType: string } },
@@ -48,7 +48,23 @@ export class D1MediaBucket implements Bucket {
             new Uint8Array(data.slice(offset, offset + chunkSize)).buffer,
           ),
       );
-    await db.batch(statements);
+    return statements;
+  }
+  /** Linked proofs and their payment metadata share one guarded D1 batch. */
+  putInBatch(
+    batch: Batch,
+    key: string,
+    data: Uint8Array,
+    options: { httpMetadata: { contentType: string } },
+  ) {
+    batch.statements.push(...this.putStatements(key, data, options));
+  }
+  async put(
+    key: string,
+    data: Uint8Array,
+    options: { httpMetadata: { contentType: string } },
+  ) {
+    await database().batch(this.putStatements(key, data, options));
   }
   async delete(key: string) {
     this.check(key);

@@ -17,7 +17,12 @@ export function isolatedD1() {
   const prepare = (sql: string, values: unknown[] = []) => ({
     bind: (...v: unknown[]) => {
       assert.ok(v.length <= 100);
-      return prepare(sql, v);
+      return prepare(
+        sql,
+        v.map((value) =>
+          value instanceof ArrayBuffer ? new Uint8Array(value) : value,
+        ),
+      );
     },
     all: async () => ({
       results: sqlite.prepare(sql).all(...(values as never[])),
@@ -43,5 +48,5 @@ export function isolatedD1() {
       }
     },
   } as unknown as Database;
-  return { sqlite, run: <T>(fn: () => T) => withDatabase(db, fn) };
+  return { sqlite, db, run: <T>(fn: () => T) => withDatabase(db, fn) };
 }
