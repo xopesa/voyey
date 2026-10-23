@@ -1027,6 +1027,14 @@ export const models = {
   },
   CartItem: {
     fields: {
+      saleMode: {
+        type: "String",
+        optional: false,
+        id: false,
+        unique: false,
+        updated: false,
+        default: "LEGACY",
+      },
       id: {
         type: "String",
         optional: false,
@@ -1119,7 +1127,7 @@ export const models = {
     indexes: [
       {
         unique: true,
-        fields: ["cartId", "variantId"],
+        fields: ["cartId", "variantId", "saleMode"],
       },
       {
         unique: false,

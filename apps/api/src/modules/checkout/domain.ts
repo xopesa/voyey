@@ -4,7 +4,7 @@ import {
 } from "@stenzo/shared";
 import { randomBytes } from "node:crypto";
 
-import { assertPurchasable } from "../cart/domain.js";
+import { assertPurchasable, assertLegacyCheckout } from "../cart/domain.js";
 import type { CartItemRecord, CartRecord } from "../cart/types.js";
 import type { PreparedOrder } from "../orders/types.js";
 import {
@@ -30,6 +30,7 @@ export function prepareOrder(
 export type CheckoutLine = Pick<
   CartItemRecord,
   | "productId"
+  | "saleMode"
   | "variantId"
   | "quantity"
   | "heightCm"
@@ -42,6 +43,7 @@ export function prepareOrderItems(
   now = Date.now(),
 ): PreparedOrder {
   if (cartItems.length === 0) throw new CheckoutEmptyCartError();
+  assertLegacyCheckout(cartItems);
   const items = cartItems.map((item) => {
     const required = item.product.category.requiresBuyerMeasurements !== false;
     const validMeasurement = (

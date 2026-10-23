@@ -251,6 +251,7 @@ model Cart {
 }
 
 model CartItem {
+  saleMode String @default("LEGACY")
   id        String   @id @default(cuid())
   cartId    String
   productId String
@@ -265,7 +266,7 @@ model CartItem {
   product Product        @relation(fields: [productId], references: [id], onDelete: Restrict)
   variant ProductVariant @relation(fields: [variantId], references: [id], onDelete: Restrict)
 
-  @@unique([cartId, variantId])
+  @@unique([cartId, variantId, saleMode])
   @@index([productId])
   @@index([variantId])
 }

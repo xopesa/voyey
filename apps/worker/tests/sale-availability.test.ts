@@ -424,7 +424,7 @@ test("actual checkout rejects typed PREORDER/IN_STOCK and manual-order overrides
       );
       assert.equal(
         (await call("/cart/items", { ...line, saleMode: mode })).status,
-        400,
+        201,
       );
       const manual = { userId: user.id, recipient, items: [line] };
       assert.equal(
@@ -454,6 +454,15 @@ test("actual checkout rejects typed PREORDER/IN_STOCK and manual-order overrides
         .first<{ n: number }>())!.n,
       0,
     );
+    assert.equal((await call("/checkout", recipient)).status, 409);
+    await f.call(
+      "/cart",
+      "DELETE",
+      undefined,
+      headers,
+      "https://preview.invalid",
+    );
+    await call("/cart/items", line);
     const legacy = await call("/checkout", recipient);
     assert.equal(legacy.status, 201);
     const { order } = (await legacy.json()) as {

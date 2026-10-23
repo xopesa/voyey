@@ -1,6 +1,6 @@
 import { Prisma, prisma } from "@stenzo/database";
 
-import { assertPurchasable } from "./domain.js";
+import { assertCartSelection } from "./domain.js";
 import { CartItemNotFoundError } from "./errors.js";
 import type {
   AddCartItemInput,
@@ -124,12 +124,30 @@ export class PrismaCartRepository implements CartRepository {
       );
       const existing = await tx.cartItem.findUnique({
         where: {
-          cartId_variantId: { cartId: cart.id, variantId: input.variantId },
+          cartId_variantId_saleMode: {
+            cartId: cart.id,
+            variantId: input.variantId,
+            saleMode: input.saleMode ?? "LEGACY",
+          },
         },
         select: { id: true, quantity: true },
       });
       const quantity = (existing?.quantity ?? 0) + input.quantity;
-      assertPurchasable(product, variant, input.productId, quantity);
+      const siblings = await tx.cartItem.findMany({
+        where: {
+          cartId: cart.id,
+          variantId: input.variantId,
+          ...(existing ? { id: { not: existing.id } } : {}),
+        },
+      });
+      assertCartSelection(
+        product,
+        variant,
+        input.productId,
+        input.saleMode,
+        quantity,
+        siblings,
+      );
       if (existing) {
         await tx.cartItem.update({
           where: { id: existing.id },
@@ -141,7 +159,11 @@ export class PrismaCartRepository implements CartRepository {
         });
       } else {
         await tx.cartItem.create({
-          data: { cartId: cart.id, ...input },
+          data: {
+            cartId: cart.id,
+            ...input,
+            saleMode: input.saleMode ?? "LEGACY",
+          },
         });
       }
       return getCart(tx, userId);
@@ -163,11 +185,20 @@ export class PrismaCartRepository implements CartRepository {
         item.productId,
         item.variantId,
       );
-      assertPurchasable(
+      const siblings = await tx.cartItem.findMany({
+        where: {
+          cartId: item.cartId,
+          variantId: item.variantId,
+          id: { not: item.id },
+        },
+      });
+      assertCartSelection(
         product,
         variant,
         item.productId,
+        item.saleMode,
         input.quantity ?? item.quantity,
+        siblings,
       );
       await tx.cartItem.update({ where: { id: item.id }, data: input });
       return getCart(tx, userId);

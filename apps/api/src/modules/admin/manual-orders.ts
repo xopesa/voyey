@@ -40,6 +40,11 @@ export type ManualOrderInput = z.infer<typeof manualOrderSchema>;
 export function parseManualOrder(value: unknown): ManualOrderInput {
   const parsed = manualOrderSchema.safeParse(value);
   if (!parsed.success) throw new HttpError(400, "manualInvalid");
+  if (parsed.data.items.some((item) => item.saleMode !== undefined))
+    throw new HttpError(
+      400,
+      "Explicit sale modes are disabled for manual orders",
+    );
   if (
     new Set(parsed.data.items.map((i) => i.variantId)).size !==
     parsed.data.items.length

@@ -3,6 +3,7 @@ export interface CartSnapshot {
   id: string;
   subtotal: number;
   items: Array<{
+    saleMode?: string;
     id: string;
     product: { id: string };
     variant: { id: string; stock: number | null };
@@ -21,6 +22,7 @@ export function cartSnapshotVersion(cart: CartSnapshot): string {
     cart.items
       .map((item) => [
         item.id,
+        item.saleMode ?? "LEGACY",
         item.product.id,
         item.variant.id,
         item.quantity,

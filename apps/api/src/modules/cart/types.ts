@@ -1,3 +1,4 @@
+import type { CartSaleMode } from "@stenzo/shared";
 export interface CartCategoryRecord {
   id?: string;
   nameRu?: string;
@@ -29,6 +30,7 @@ export interface CartProductRecord {
 }
 
 export interface CartVariantRecord {
+  preorderEnabled?: boolean;
   attributes?: unknown;
   id: string;
   productId: string;
@@ -40,6 +42,7 @@ export interface CartVariantRecord {
 }
 
 export interface CartItemRecord {
+  saleMode?: string;
   id: string;
   cartId: string;
   productId: string;
@@ -62,6 +65,7 @@ export interface CartRecord {
 }
 
 export interface AddCartItemInput {
+  saleMode?: CartSaleMode;
   productId: string;
   variantId: string;
   quantity: number;
@@ -76,6 +80,8 @@ export interface PatchCartItemInput {
 }
 
 export interface CartItemDto {
+  saleMode: CartSaleMode;
+  checkoutEnabled: boolean;
   id: string;
   quantity: number;
   heightCm: number | null;

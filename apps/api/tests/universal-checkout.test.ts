@@ -167,7 +167,7 @@ describe("category-based buyer measurements", () => {
     ]) {
       expect(
         addCartItemSchema.safeParse({ ...input.items[0], ...extra }).success,
-      ).toBe(false);
+      ).toBe("saleMode" in extra);
       expect(() =>
         parseManualOrder({
           ...input,

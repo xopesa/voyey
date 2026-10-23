@@ -1,4 +1,5 @@
 import { effectiveProductPrice } from "@stenzo/shared";
+import { assertCartSelection, cartSaleMode } from "./domain.js";
 import type { CartRepository } from "./repository.js";
 import type {
   AddCartItemInput,
@@ -9,15 +10,24 @@ import type {
 
 export function toCartDto(cart: CartRecord, now = Date.now()): CartDto {
   const items = cart.items.map((item) => {
-    const isAvailable =
-      !item.product.archivedAt &&
-      !item.product.category.archivedAt &&
-      item.product.status === "ACTIVE" &&
-      item.product.category.isActive &&
-      item.variant.isActive &&
-      item.variant.productId === item.productId &&
-      (item.variant.stock === null || item.quantity <= item.variant.stock);
+    let isAvailable = true;
+    try {
+      assertCartSelection(
+        item.product,
+        item.variant,
+        item.productId,
+        item.saleMode,
+        item.quantity,
+        cart.items.filter(
+          (other) => other.variantId === item.variantId && other.id !== item.id,
+        ),
+      );
+    } catch {
+      isAvailable = false;
+    }
     return {
+      saleMode: cartSaleMode(item.saleMode),
+      checkoutEnabled: cartSaleMode(item.saleMode) === "LEGACY",
       id: item.id,
       quantity: item.quantity,
       heightCm: item.heightCm,

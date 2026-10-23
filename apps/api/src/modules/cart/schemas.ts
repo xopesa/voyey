@@ -7,6 +7,7 @@ const weightSchema = z.number().int().min(30).max(300).nullable();
 export const addCartItemSchema = z
   .object({
     productId: z.string().trim().min(1).max(100),
+    saleMode: z.enum(["IN_STOCK", "PREORDER"]).optional(),
     variantId: z.string().trim().min(1).max(100),
     quantity: quantitySchema,
     heightCm: heightSchema.default(null),

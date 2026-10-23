@@ -24,7 +24,10 @@ import type {
   AddCartItemInput,
   PatchCartItemInput,
 } from "../modules/cart/types.js";
-import { assertPurchasable } from "../modules/cart/domain.js";
+import {
+  assertCartSelection,
+  assertLegacyCheckout,
+} from "../modules/cart/domain.js";
 import {
   CartItemNotFoundError,
   CartStockExceededError,
@@ -150,18 +153,45 @@ export class D1CartRepository extends PrismaCartRepository {
       });
       const existing = cart
         ? await prisma.cartItem.findUnique({
-            where: { cartId_variantId: { cartId, variantId: input.variantId } },
+            where: {
+              cartId_variantId_saleMode: {
+                cartId,
+                variantId: input.variantId,
+                saleMode: input.saleMode ?? "LEGACY",
+              },
+            },
           })
         : null;
       const quantity = (existing?.quantity ?? 0) + input.quantity;
-      assertPurchasable(product, variant, input.productId, quantity);
+      const siblings = cart
+        ? await prisma.cartItem.findMany({
+            where: {
+              cartId,
+              variantId: input.variantId,
+              ...(existing ? { id: { not: existing.id } } : {}),
+            },
+          })
+        : [];
+      assertCartSelection(
+        product,
+        variant,
+        input.productId,
+        input.saleMode,
+        quantity,
+        siblings,
+      );
       if (existing)
         batch.update("CartItem", existing.id, {
           quantity,
           heightCm: input.heightCm,
           weightKg: input.weightKg,
         });
-      else batch.insert("CartItem", { cartId, ...input });
+      else
+        batch.insert("CartItem", {
+          cartId,
+          ...input,
+          saleMode: input.saleMode ?? "LEGACY",
+        });
     });
     return getCart(userId);
   }
@@ -182,11 +212,20 @@ export class D1CartRepository extends PrismaCartRepository {
       const variant = await prisma.productVariant.findUnique({
         where: { id: item.variantId },
       });
-      assertPurchasable(
+      const siblings = await prisma.cartItem.findMany({
+        where: {
+          cartId: item.cartId,
+          variantId: item.variantId,
+          id: { not: item.id },
+        },
+      });
+      assertCartSelection(
         product,
         variant,
         item.productId,
+        item.saleMode,
         input.quantity ?? item.quantity,
+        siblings,
       );
       batch.update("CartItem", item.id, { ...input });
     });
@@ -248,6 +287,7 @@ export async function writeD1Order(
   source: "MINIAPP" | "ADMIN",
   actorId: string,
 ) {
+  assertLegacyCheckout(lines);
   const { items, amounts, promoCodeId, discountAmount, promoCodeSnapshot } =
     priced;
   if (new Set(lines.map((l) => l.variantId)).size !== lines.length)
