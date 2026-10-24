@@ -1,0 +1,160 @@
+{
+  "stage": "ADMIN-01",
+  "date": "2026-10-24",
+  "baseline": "7c67ee12596d6b2b67e1d844e03a5ca677941cbe",
+  "dependency": {
+    "workspace": "apps/admin",
+    "motion": "14.6.0",
+    "lockedReact": "19.3.0",
+    "install": "pnpm install --frozen-lockfile; exit 0"
+  },
+  "commands": [
+    {
+      "name": "config",
+      "args": [
+        "config:check"
+      ],
+      "exit": 0,
+      "seconds": 0.3
+    },
+    {
+      "name": "build",
+      "args": [
+        "build"
+      ],
+      "exit": 0,
+      "seconds": 12.5
+    },
+    {
+      "name": "typecheck",
+      "args": [
+        "typecheck"
+      ],
+      "exit": 0,
+      "seconds": 2.7
+    },
+    {
+      "name": "lint",
+      "args": [
+        "lint"
+      ],
+      "exit": 0,
+      "seconds": 3.7
+    },
+    {
+      "name": "test-config",
+      "args": [
+        "test:config"
+      ],
+      "exit": 0,
+      "seconds": 0.5
+    },
+    {
+      "name": "full-test-fresh",
+      "args": [
+        "exec",
+        "turbo",
+        "run",
+        "test",
+        "--force",
+        "--concurrency=1"
+      ],
+      "exit": 0,
+      "seconds": 91.3
+    }
+  ],
+  "tests": {
+    "config": {
+      "passed": 10,
+      "skipped": 0
+    },
+    "worker": {
+      "passed": 862,
+      "skipped": 0
+    },
+    "api": {
+      "passed": 249,
+      "skipped": 5
+    },
+    "bot": {
+      "passed": 16,
+      "skipped": 0
+    },
+    "miniapp": {
+      "passed": 200,
+      "skipped": 0
+    },
+    "admin": {
+      "passed": 194,
+      "skipped": 0,
+      "newAdminTests": 44
+    },
+    "total": {
+      "passed": 1531,
+      "skipped": 5,
+      "failed": 0
+    }
+  },
+  "gitleaks": {
+    "mode": "dir, default rules, redact",
+    "findings": 0
+  },
+  "gitFsck": {
+    "command": "git fsck --full --strict",
+    "exit": 0
+  },
+  "http": [
+    {
+      "path": "/admin/voyey-admin-demo.html",
+      "status": 200
+    },
+    {
+      "path": "/admin/src/voyey/entry.tsx",
+      "status": 200
+    },
+    {
+      "path": "/admin/src/voyey/App.tsx",
+      "status": 200
+    },
+    {
+      "path": "/admin/src/voyey/components.tsx",
+      "status": 200
+    },
+    {
+      "path": "/admin/src/voyey/model.ts",
+      "status": 200
+    },
+    {
+      "path": "/admin/src/voyey/messages.ts",
+      "status": 200
+    },
+    {
+      "path": "/admin/src/voyey/screens.tsx",
+      "status": 200
+    },
+    {
+      "path": "/admin/src/voyey/styles.css",
+      "status": 200
+    }
+  ],
+  "visualQA": {
+    "performed": false,
+    "reason": "Local browser control previously disabled in Work; no new browser interaction or screenshots in this stage",
+    "unverifiedWidths": [
+      320,
+      390,
+      430,
+      768,
+      1024,
+      1280,
+      1440
+    ]
+  },
+  "forbiddenOperations": {
+    "push": false,
+    "merge": false,
+    "deployment": false,
+    "realMigrations": false,
+    "realAuthOrFinancialCalls": false
+  }
+}

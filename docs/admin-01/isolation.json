@@ -1,0 +1,82 @@
+{
+  "base": "7c67ee12596d6b2b67e1d844e03a5ca677941cbe",
+  "baseFiles": 723,
+  "comparedSHA256": 723,
+  "unchanged": 721,
+  "changed": [
+    "apps/admin/package.json",
+    "pnpm-lock.yaml"
+  ],
+  "missing": [],
+  "unexpected": [],
+  "unchangedD1Migrations": 28,
+  "unchangedOriginalAssets": 7,
+  "productionDemoAbsent": true,
+  "production": [
+    {
+      "path": "apps/admin/dist/assets/index-CPf77HxM.css",
+      "sha256": "cd16fca636146181b740d86352aeb5dc23f5b7c2017d3c0d9a8ec66b9f992891",
+      "unchangedFromUI02": true
+    },
+    {
+      "path": "apps/admin/dist/assets/index-DCatBEP0.js",
+      "sha256": "81c978b98085715a4d07b88d377c82ef5e4787804d735116822c5b6194134f8f",
+      "unchangedFromUI02": true
+    },
+    {
+      "path": "apps/admin/dist/index.html",
+      "sha256": "067da7185a0e9841ec14430487b6c420ab20e9c893907668ceb3b8a622ae5ca4",
+      "unchangedFromUI02": true
+    },
+    {
+      "path": "apps/miniapp/dist/assets/index-Bh13fmZe.js",
+      "sha256": "b943acec9252f0a06ed8ad36ce6bcfe0f768f8508ab31bd24ac07552544c8f39",
+      "unchangedFromUI02": true
+    },
+    {
+      "path": "apps/miniapp/dist/assets/index-Cgn5PNrw.css",
+      "sha256": "3c9e0702b75a6541a8cb1b1777e6d10663b000b8dd46c8777ab8fa2c4c2e268b",
+      "unchangedFromUI02": true
+    },
+    {
+      "path": "apps/miniapp/dist/index.html",
+      "sha256": "3af3efdf5704e947baf9e9f683122c5883016262bd88c2718aafafe1c8399a12",
+      "unchangedFromUI02": true
+    },
+    {
+      "path": "apps/worker/public/admin/assets/index-CPf77HxM.css",
+      "sha256": "cd16fca636146181b740d86352aeb5dc23f5b7c2017d3c0d9a8ec66b9f992891",
+      "unchangedFromUI02": true
+    },
+    {
+      "path": "apps/worker/public/admin/assets/index-DCatBEP0.js",
+      "sha256": "81c978b98085715a4d07b88d377c82ef5e4787804d735116822c5b6194134f8f",
+      "unchangedFromUI02": true
+    },
+    {
+      "path": "apps/worker/public/admin/index.html",
+      "sha256": "067da7185a0e9841ec14430487b6c420ab20e9c893907668ceb3b8a622ae5ca4",
+      "unchangedFromUI02": true
+    },
+    {
+      "path": "apps/worker/public/assets/index-Bh13fmZe.js",
+      "sha256": "b943acec9252f0a06ed8ad36ce6bcfe0f768f8508ab31bd24ac07552544c8f39",
+      "unchangedFromUI02": true
+    },
+    {
+      "path": "apps/worker/public/assets/index-CeXyqpfA.js",
+      "sha256": "fcc503d1687925f422c513ae5ce85898f1099b92e0f07e2b2d1e1a46c84b4f92",
+      "unchangedFromUI02": true
+    },
+    {
+      "path": "apps/worker/public/assets/index-Cgn5PNrw.css",
+      "sha256": "3c9e0702b75a6541a8cb1b1777e6d10663b000b8dd46c8777ab8fa2c4c2e268b",
+      "unchangedFromUI02": true
+    },
+    {
+      "path": "apps/worker/public/index.html",
+      "sha256": "3af3efdf5704e947baf9e9f683122c5883016262bd88c2718aafafe1c8399a12",
+      "unchangedFromUI02": true
+    }
+  ]
+}

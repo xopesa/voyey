@@ -46,6 +46,9 @@ importers:
       dotenv:
         specifier: 17.2.2
         version: 17.2.2
+      motion:
+        specifier: 14.6.0
+        version: 14.6.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       next:
         specifier: ^15.5.4
         version: 15.5.26(@types/node@24.19.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
