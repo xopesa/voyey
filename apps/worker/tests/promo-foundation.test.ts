@@ -306,15 +306,15 @@ test("PERCENT integer floor/cap and FIXED capped by eligible goods, never negati
     value: 999,
     saleModes: "PREORDER",
   });
-  assert.equal(fixed.discountAmount, 101);
-  assert.equal(fixed.total, 101);
+  assert.equal(fixed.discountAmount, 99);
+  assert.equal(fixed.total, 103);
   assert.equal(
     fixed.allocationProposal.find((g) => g.key === "IN_STOCK")!.discount,
     0,
   );
   const zero = valid({ ...base, type: "FIXED", value: 202 });
-  assert.equal(zero.total, 0);
-  assert.equal(zero.discountAmount, 202);
+  assert.equal(zero.total, 3);
+  assert.equal(zero.discountAmount, 199);
   assert.equal(
     quote({ ...base, value: 1 }, context([line("a", "p", "c", "IN_STOCK", 1)]))
       .valid,
@@ -455,7 +455,7 @@ test("CARGO/local delivery excluded structurally, integer boundary/overflow/inpu
   for (const p of [
     { ...base, value: -1 },
     { ...base, value: 1.5 },
-    { ...base, value: 91 },
+    { ...base, value: 100 },
     { ...base, type: "FIXED", maxDiscount: 1 },
     { ...base, scope: "CATEGORIES" },
     { ...base, scope: "ALL", productIds: ["p"] },

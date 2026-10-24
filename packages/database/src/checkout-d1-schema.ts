@@ -2,6 +2,13 @@
 export const checkoutModels = {
   CheckoutGroup: {
     fields: {
+      selectedSaleMode: {
+        type: "String",
+        optional: true,
+        id: false,
+        unique: false,
+        updated: false,
+      },
       id: {
         type: "String",
         optional: false,

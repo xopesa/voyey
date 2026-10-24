@@ -1,13 +1,13 @@
 import { z } from "zod";
 import { HttpError } from "../auth/errors.js";
 import { proposeDiscountAllocation } from "../checkout/split-plan.js";
-import { promoSchema } from "./promo-codes.js";
+import { promoSettingsSchema } from "./promo-codes.js";
 
 const id = z.string().trim().min(1).max(100);
 const mode = z.enum(["IN_STOCK", "PREORDER", "BOTH"]);
 const ids = z.array(id).max(100).default([]);
-/** Reuses the existing code/money/date validation, including the inherited 1..90 percent limit. */
-export const promoPolicySchema = promoSchema
+/** Shared code/money/date validation; v2 alone supports percentages through 99. */
+export const promoPolicySchema = promoSettingsSchema
   .safeExtend({
     saleModes: mode.default("BOTH"),
     audience: z.enum(["PUBLIC", "PERSONAL", "BLOGGER"]).default("PUBLIC"),
@@ -25,6 +25,8 @@ export const promoPolicySchema = promoSchema
   .superRefine((p, ctx) => {
     const invalid = (message: string) =>
       ctx.addIssue({ code: "custom", message });
+    if (p.type === "PERCENT" && p.value > 99)
+      invalid("Maximum VOYEY discount is 99 percent");
     if (
       (p.audience === "PERSONAL") !== (p.personalUserId !== null) ||
       (p.audience === "BLOGGER") !== (p.campaignId !== null)
@@ -151,7 +153,7 @@ export function evaluatePromoPolicy(value: unknown, context: unknown) {
       ? p.value
       : Number((BigInt(eligibleSubtotal) * BigInt(p.value)) / 100n);
   const discountAmount = Math.min(
-    eligibleSubtotal,
+    Number((BigInt(eligibleSubtotal) * 99n) / 100n),
     raw,
     p.type === "PERCENT" ? (p.maxDiscount ?? 2147483647) : 2147483647,
   );

@@ -1193,10 +1193,15 @@ test("migration 0022 preserves existing 0021 snapshots, tables, guards and initi
         "CheckoutOrderItem",
       ]) {
         for (const source of f.sqlite.prepare(`SELECT * FROM ${table}`).all()) {
-          const row = {
+          const row: Record<string, unknown> = {
             ...source,
             ...(table === "CheckoutGroup" ? { sealed: 0 } : {}),
           };
+          // Reconstruct the historical 0021 shape, before the nullable 0027 selector.
+          if (table === "CheckoutGroup") {
+            assert.equal(row.selectedSaleMode, null);
+            delete row.selectedSaleMode;
+          }
           const keys = Object.keys(row);
           sqlite
             .prepare(

@@ -3,7 +3,7 @@ import { atomic, prisma } from "@stenzo/database";
 import { cartInclude } from "../cart/repository.js";
 import { recipientSchema, idempotencyKeySchema } from "../orders/schemas.js";
 import { HttpError } from "../auth/errors.js";
-import { buildSplitCheckoutPlan } from "./split-plan.js";
+import { buildSplitCheckoutPlan, type CheckoutSaleMode } from "./split-plan.js";
 import {
   calculateSplitFinance,
   splitFinanceSelectionSchema,
@@ -20,7 +20,10 @@ const fingerprint = (v: unknown) =>
   createHash("sha256").update(JSON.stringify(v)).digest("hex");
 /** Internal only. No HTTP route, notifications, credentials or environment activation switch. */
 export class LinkedCheckoutCommit {
-  constructor(private readonly enabled = false) {}
+  constructor(
+    private readonly enabled = false,
+    private readonly selectedMode?: CheckoutSaleMode,
+  ) {}
   async create(userId: string, key: string, value: unknown) {
     if (!this.enabled)
       throw new HttpError(503, "Linked checkout is disabled until 2.4C");
@@ -30,9 +33,17 @@ export class LinkedCheckoutCommit {
       throw new HttpError(400, "Invalid linked checkout request");
     key = parsedKey.data;
     const data = request.data;
+    if (
+      this.selectedMode !== undefined &&
+      !["IN_STOCK", "PREORDER"].includes(this.selectedMode)
+    )
+      throw new HttpError(400, "Invalid selected sale mode");
     // Canonical request intent excludes today's cart/catalog so replay never consumes a new cart.
     const requestFingerprint = fingerprint({
-      operation: "VOYEY_LINKED_V1",
+      operation: this.selectedMode
+        ? "VOYEY_SELECTED_MODE_V1"
+        : "VOYEY_LINKED_V1",
+      ...(this.selectedMode ? { saleMode: this.selectedMode } : {}),
       recipient: data.recipient,
       preorderPercent: data.preorderPercent ?? null,
       promoCode: data.promoCode?.trim().toUpperCase() ?? null,
@@ -65,7 +76,14 @@ export class LinkedCheckoutCommit {
       });
       if (!cart) throw new HttpError(409, "Cart is empty");
       const now = Date.now(),
-        plan = buildSplitCheckoutPlan(cart, key, now);
+        plan = buildSplitCheckoutPlan(cart, key, now, this.selectedMode);
+      if (
+        this.selectedMode &&
+        plan.orders.some(
+          (o) => o.items.some((i) => i.unitPrice <= 0) || o.subtotal <= 0,
+        )
+      )
+        throw new HttpError(409, "New checkout requires positive goods prices");
       let discount = 0,
         promoId: string | undefined;
       if (data.promoCode !== undefined) {
@@ -84,8 +102,18 @@ export class LinkedCheckoutCommit {
         data.preorderPercent,
         discount,
       );
+      if (
+        this.selectedMode &&
+        (finance.groups.length !== 1 ||
+          finance.goodsTotal <= 0 ||
+          finance.groups[0]!.firstPaymentAmount <= 0)
+      )
+        throw new HttpError(
+          409,
+          "New checkout requires positive goods total and FIRST",
+        );
       b.sql(
-        "INSERT INTO CheckoutGroup(id,userId,idempotencyKey,requestFingerprint,recipient,goodsSubtotal,discountAmount,goodsTotal,createdAt) VALUES(?,?,?,?,?,?,?,?,?)",
+        `INSERT INTO CheckoutGroup(id,userId,idempotencyKey,requestFingerprint,recipient,goodsSubtotal,discountAmount,goodsTotal,createdAt${this.selectedMode ? ",selectedSaleMode" : ""}) VALUES(?,?,?,?,?,?,?,?,?${this.selectedMode ? ",?" : ""})`,
         groupId,
         userId,
         key,
@@ -95,6 +123,7 @@ export class LinkedCheckoutCommit {
         discount,
         finance.goodsTotal,
         now,
+        ...(this.selectedMode ? [this.selectedMode] : []),
       );
       for (const order of plan.orders) {
         const policy = finance.groups.find(

@@ -20,7 +20,7 @@ const date = z.iso
   .transform((v) => new Date(v))
   .nullable()
   .default(null);
-export const promoSchema = z
+export const promoSettingsSchema = z
   .object({
     code: z
       .string()
@@ -38,9 +38,12 @@ export const promoSchema = z
     isActive: z.boolean().default(false),
   })
   .strict()
-  .refine((p) => p.type !== "PERCENT" || p.value <= 90)
   .refine((p) => !(p.startsAt && p.endsAt) || p.startsAt < p.endsAt)
   .refine((p) => p.type !== "FIXED" || p.maxDiscount == null);
+// Legacy API contract remains 1..90; the internal v2 policy has its own limit.
+export const promoSchema = promoSettingsSchema.refine(
+  (p) => p.type !== "PERCENT" || p.value <= 90,
+);
 export function parsePromo(value: unknown) {
   const result = promoSchema.safeParse(value);
   if (!result.success) throw new HttpError(400, "promoInvalidSettings");

@@ -7,7 +7,8 @@ import { HttpError } from "../auth/errors.js";
 import { idempotencyKeySchema } from "../orders/schemas.js";
 import { snapshotCheckoutLine } from "./domain.js";
 
-type Mode = "IN_STOCK" | "PREORDER";
+export type CheckoutSaleMode = "IN_STOCK" | "PREORDER";
+type Mode = CheckoutSaleMode;
 const digest = (value: unknown) =>
   createHash("sha256").update(JSON.stringify(value)).digest("hex");
 export type SplitCheckoutPlan = {
@@ -43,24 +44,30 @@ export function buildSplitCheckoutPlan(
   cart: CartRecord,
   key: string,
   now = Date.now(),
+  selectedMode?: Mode,
 ): SplitCheckoutPlan {
   const parsedKey = idempotencyKeySchema.safeParse(key);
   if (!parsedKey.success) throw new HttpError(400, "Invalid Idempotency-Key");
   key = parsedKey.data;
   if (!cart.items.length) throw new HttpError(409, "Cart is empty");
-  if (cart.items.some((i) => cartSaleMode(i.saleMode) === "LEGACY"))
+  const selected = selectedMode
+    ? cart.items.filter((i) => i.saleMode === selectedMode)
+    : cart.items;
+  if (!selected.length)
+    throw new HttpError(409, "Selected sale-mode tab is empty");
+  if (selected.some((i) => cartSaleMode(i.saleMode) === "LEGACY"))
     throw new HttpError(
       409,
       "LEGACY rows require the legacy checkout; automatic conversion is disabled",
     );
-  const rowKeys = cart.items.map((i) => `${i.variantId}:${i.saleMode}`);
+  const rowKeys = selected.map((i) => `${i.variantId}:${i.saleMode}`);
   if (new Set(rowKeys).size !== rowKeys.length)
     throw new HttpError(409, "Duplicate cart mode row");
   const checkoutGroupId =
     "plan-" + digest(["VOYEY_SPLIT_V1", cart.userId, key]);
   const orders: SplitCheckoutPlan["orders"] = [];
   for (const mode of ["IN_STOCK", "PREORDER"] as const) {
-    const rows = cart.items
+    const rows = selected
       .filter((i) => i.saleMode === mode)
       .sort((a, b) => a.id.localeCompare(b.id));
     if (!rows.length) continue;
@@ -95,7 +102,7 @@ export function buildSplitCheckoutPlan(
   const subtotal = orders.reduce((n, o) => n + o.subtotal, 0);
   if (!Number.isSafeInteger(subtotal) || subtotal > 2147483647)
     throw new HttpError(409, "Checkout amount limit");
-  const inventory = cart.items
+  const inventory = selected
     .filter((i) => i.saleMode === "IN_STOCK")
     .map((i) => ({
       variantId: i.variantId,
@@ -103,7 +110,7 @@ export function buildSplitCheckoutPlan(
       expectedStock: i.variant.stock!,
     }))
     .sort((a, b) => a.variantId.localeCompare(b.variantId));
-  const consumeCartItemIds = cart.items.map((i) => i.id).sort();
+  const consumeCartItemIds = selected.map((i) => i.id).sort();
   return {
     version: 1,
     executable: false,

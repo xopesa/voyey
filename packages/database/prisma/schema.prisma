@@ -557,6 +557,7 @@ model PromoCodeRedemption {
 // Isolated linked-order contracts. Foreign keys and immutable quarantine are enforced by D1 0021.
 model CheckoutGroup {
  id String @id
+ selectedSaleMode String?
  userId String
  idempotencyKey String
  requestFingerprint String

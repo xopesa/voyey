@@ -233,8 +233,17 @@ export class PromoFoundation {
       }
     });
   }
-  async preview(authorization: string | undefined, value: string) {
+  async preview(
+    authorization: string | undefined,
+    value: string,
+    selectedMode?: "IN_STOCK" | "PREORDER",
+  ) {
     this.gate();
+    if (
+      selectedMode !== undefined &&
+      !["IN_STOCK", "PREORDER"].includes(selectedMode)
+    )
+      throw new HttpError(400, "Invalid selected sale mode");
     const code = normalizePromoCode(value);
     if (!code) throw new HttpError(400, "Invalid promo code");
     return atomic(async () => {
@@ -294,6 +303,7 @@ export class PromoFoundation {
             cart,
             "voyey-promo-preview-v2",
             now,
+            selectedMode,
           ).orders.flatMap((o) =>
             o.items.map((i) => ({
               lineId: i.cartItemId,
