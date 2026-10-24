@@ -1,0 +1,61 @@
+{
+  "stage": "UI-01",
+  "assets": [
+    {
+      "file": "apps/miniapp/src/voyey/assets/care.png",
+      "sha256": "7e1a07d1e8690cad5385789daf461ca895deb88cb51d223bf8283e3ad6da3112",
+      "kind": "temporary-generated-product-photo",
+      "mode": "built-in imagegen; generation, opaque background; unchanged output",
+      "source": null,
+      "prompt": "An unbranded simple matte ivory hand-soap pump bottle and small natural cream cotton washcloth, for everyday hygiene not cosmetics, warm off-white tabletop. Square editorial ecommerce product photograph, centered whole objects with generous margins, soft daylight, restrained premium presentation. No label, no text, no brand, no watermark, no UI. Temporary demo ecommerce asset."
+    },
+    {
+      "file": "apps/miniapp/src/voyey/assets/hoodie.png",
+      "sha256": "c2f7a5448f22a1d1b8b5503a297989737740f2eb1ba458786676faa98f9d9707",
+      "kind": "temporary-generated-product-photo",
+      "mode": "built-in imagegen; generation, opaque background; unchanged output",
+      "source": null,
+      "prompt": "A premium unbranded sand beige cotton hoodie folded neatly, with the hood visible, warm neutral tabletop. Square editorial ecommerce product photography, centered whole object with generous margins, soft natural window light, tactile cotton texture. No lettering, no logo, no text, no watermark, no UI. Temporary demo ecommerce asset."
+    },
+    {
+      "file": "apps/miniapp/src/voyey/assets/markers.png",
+      "sha256": "e3111b80ce6320671d9b683ceefe9dd7a30f6b53190b5a765cfb4a7119587943",
+      "kind": "temporary-generated-product-photo",
+      "mode": "built-in imagegen; generation, opaque background; unchanged output",
+      "source": null,
+      "prompt": "A neat set of twelve pastel felt-tip markers fanned out: coral, peach, butter yellow, sage, sky blue and lilac. Square studio product photograph, entire set centered with generous margins, warm off-white desktop, soft natural shadows, realistic plastic texture. No text, no logos, no lettering, no watermark, no UI. Temporary demo ecommerce asset."
+    },
+    {
+      "file": "apps/miniapp/src/voyey/assets/notebook.png",
+      "sha256": "9147412d2abf2a28ad779bea5cc3de27c5b7994dd8672e23220d1b0b8fe84797",
+      "kind": "temporary-generated-product-photo",
+      "mode": "built-in imagegen; generation, opaque background; unchanged output",
+      "source": null,
+      "prompt": "A premium blush pink A5 spiral notebook with small gold wire binding, unmarked cover, a warm ivory pen beside it. Square product photograph, entire object centered with generous margins. Warm pale beige desktop, soft natural window light, editorial ecommerce photography. No text, no brand, no lettering, no watermark, no UI, no decorative frame. This is a temporary demo ecommerce asset."
+    },
+    {
+      "file": "apps/miniapp/src/voyey/assets/pouch.png",
+      "sha256": "2fb1b8248f2be9003c2e5ddb7b86c556043c4299c21ed53038e75ef1fa44b05d",
+      "kind": "temporary-generated-product-photo",
+      "mode": "built-in imagegen; generation, opaque background; unchanged output",
+      "source": null,
+      "prompt": "A small blush pink woven fabric pencil pouch with beige zipper, next to a single ivory pen, warm pale beige tabletop. Square product photography, full objects centered with generous margins, natural soft shadows, premium ecommerce editorial style, tangible fabric texture. No brand, no text, no watermark, no UI. Temporary demo ecommerce asset."
+    },
+    {
+      "file": "apps/miniapp/src/voyey/assets/voyey-original.png",
+      "sha256": "94966b5576392f3ea19b90980be1ef60b871883b748511a8878aa39693858e96",
+      "kind": "user-original",
+      "mode": "unchanged byte copy; CSS viewport crop only",
+      "source": "C:/Users/USER/Downloads/Минималистичный логотип VOYEY с сердцем-сумочкой.png",
+      "prompt": null
+    },
+    {
+      "file": "apps/miniapp/src/voyey/assets/voyey-symbol-original.png",
+      "sha256": "b7e16675406d0f0911fdd4e8e25a41927243ecbfebc1a015742c5f50ba921842",
+      "kind": "user-original",
+      "mode": "unchanged byte copy; CSS viewport crop only",
+      "source": "C:/Users/USER/Downloads/Минималистичный логотип-сердце с ручкой.png",
+      "prompt": null
+    }
+  ]
+}

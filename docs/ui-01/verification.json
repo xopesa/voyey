@@ -1,0 +1,64 @@
+{
+  "baseline": "cc2c8b2640137ab1252b4a0ef1fc178d35afece8",
+  "preservation": {
+    "base": "cc2c8b2640137ab1252b4a0ef1fc178d35afece8",
+    "baseFiles": 678,
+    "comparedSHA256": 678,
+    "unchanged": 678,
+    "changed": [],
+    "missing": [],
+    "protectedChanges": [],
+    "oldD1MigrationsUnchanged": 28
+  },
+  "checks": {
+    "rootBuild": "passed; guarded local Worker dry-run",
+    "rootTypecheck": "passed",
+    "rootLint": "passed",
+    "prismaValidate": "passed",
+    "fullTests": {
+      "passed": 1467,
+      "skippedPostgres": 5,
+      "failed": 0
+    },
+    "miniappTests": {
+      "passed": 180,
+      "newUiTests": 11,
+      "failed": 0
+    },
+    "finalUiTypecheck": "passed",
+    "finalUiLint": "passed",
+    "prettier": "passed",
+    "gitFsck": "passed",
+    "gitDiffCheck": "passed",
+    "newUiGitleaks": "no leaks",
+    "productionDemoAbsent": true,
+    "originalLogosExact": true
+  },
+  "browser": {
+    "engine": "Codex in-app Chromium",
+    "height": 844,
+    "widths": [
+      320,
+      375,
+      390,
+      430,
+      768,
+      1280
+    ],
+    "locales": [
+      "ru",
+      "uz"
+    ],
+    "screens": [
+      "home",
+      "catalog",
+      "product",
+      "cart",
+      "checkout"
+    ],
+    "uniqueResponsiveChecks": 60,
+    "bodyHorizontalOverflow": 0,
+    "brokenImages": 0,
+    "physicalTelegramAndSoftKeyboardVerified": false
+  }
+}

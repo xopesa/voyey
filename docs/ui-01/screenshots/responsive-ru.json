@@ -1,0 +1,272 @@
+[
+  {
+    "brokenImages": 0,
+    "buyAndNavSeparate": true,
+    "client": 305,
+    "locale": "ru",
+    "screen": "home",
+    "scroll": 305,
+    "width": 320
+  },
+  {
+    "brokenImages": 0,
+    "buyAndNavSeparate": true,
+    "client": 360,
+    "locale": "ru",
+    "screen": "home",
+    "scroll": 360,
+    "width": 375
+  },
+  {
+    "brokenImages": 0,
+    "buyAndNavSeparate": true,
+    "client": 375,
+    "locale": "ru",
+    "screen": "home",
+    "scroll": 375,
+    "width": 390
+  },
+  {
+    "brokenImages": 0,
+    "buyAndNavSeparate": true,
+    "client": 415,
+    "locale": "ru",
+    "screen": "home",
+    "scroll": 415,
+    "width": 430
+  },
+  {
+    "brokenImages": 0,
+    "buyAndNavSeparate": true,
+    "client": 753,
+    "locale": "ru",
+    "screen": "home",
+    "scroll": 753,
+    "width": 768
+  },
+  {
+    "brokenImages": 0,
+    "buyAndNavSeparate": true,
+    "client": 1265,
+    "locale": "ru",
+    "screen": "home",
+    "scroll": 1265,
+    "width": 1280
+  },
+  {
+    "brokenImages": 0,
+    "buyAndNavSeparate": true,
+    "client": 305,
+    "locale": "ru",
+    "screen": "catalog",
+    "scroll": 305,
+    "width": 320
+  },
+  {
+    "brokenImages": 0,
+    "buyAndNavSeparate": true,
+    "client": 360,
+    "locale": "ru",
+    "screen": "catalog",
+    "scroll": 360,
+    "width": 375
+  },
+  {
+    "brokenImages": 0,
+    "buyAndNavSeparate": true,
+    "client": 375,
+    "locale": "ru",
+    "screen": "catalog",
+    "scroll": 375,
+    "width": 390
+  },
+  {
+    "brokenImages": 0,
+    "buyAndNavSeparate": true,
+    "client": 415,
+    "locale": "ru",
+    "screen": "catalog",
+    "scroll": 415,
+    "width": 430
+  },
+  {
+    "brokenImages": 0,
+    "buyAndNavSeparate": true,
+    "client": 753,
+    "locale": "ru",
+    "screen": "catalog",
+    "scroll": 753,
+    "width": 768
+  },
+  {
+    "brokenImages": 0,
+    "buyAndNavSeparate": true,
+    "client": 1265,
+    "locale": "ru",
+    "screen": "catalog",
+    "scroll": 1265,
+    "width": 1280
+  },
+  {
+    "brokenImages": 0,
+    "buyAndNavSeparate": true,
+    "client": 305,
+    "locale": "ru",
+    "screen": "product",
+    "scroll": 305,
+    "width": 320
+  },
+  {
+    "brokenImages": 0,
+    "buyAndNavSeparate": true,
+    "client": 360,
+    "locale": "ru",
+    "screen": "product",
+    "scroll": 360,
+    "width": 375
+  },
+  {
+    "brokenImages": 0,
+    "buyAndNavSeparate": true,
+    "client": 375,
+    "locale": "ru",
+    "screen": "product",
+    "scroll": 375,
+    "width": 390
+  },
+  {
+    "brokenImages": 0,
+    "buyAndNavSeparate": true,
+    "client": 415,
+    "locale": "ru",
+    "screen": "product",
+    "scroll": 415,
+    "width": 430
+  },
+  {
+    "brokenImages": 0,
+    "buyAndNavSeparate": true,
+    "client": 753,
+    "locale": "ru",
+    "screen": "product",
+    "scroll": 753,
+    "width": 768
+  },
+  {
+    "brokenImages": 0,
+    "buyAndNavSeparate": true,
+    "client": 1265,
+    "locale": "ru",
+    "screen": "product",
+    "scroll": 1265,
+    "width": 1280
+  },
+  {
+    "brokenImages": 0,
+    "buyAndNavSeparate": true,
+    "client": 305,
+    "locale": "ru",
+    "screen": "cart",
+    "scroll": 305,
+    "width": 320
+  },
+  {
+    "brokenImages": 0,
+    "buyAndNavSeparate": true,
+    "client": 360,
+    "locale": "ru",
+    "screen": "cart",
+    "scroll": 360,
+    "width": 375
+  },
+  {
+    "brokenImages": 0,
+    "buyAndNavSeparate": true,
+    "client": 375,
+    "locale": "ru",
+    "screen": "cart",
+    "scroll": 375,
+    "width": 390
+  },
+  {
+    "brokenImages": 0,
+    "buyAndNavSeparate": true,
+    "client": 415,
+    "locale": "ru",
+    "screen": "cart",
+    "scroll": 415,
+    "width": 430
+  },
+  {
+    "brokenImages": 0,
+    "buyAndNavSeparate": true,
+    "client": 753,
+    "locale": "ru",
+    "screen": "cart",
+    "scroll": 753,
+    "width": 768
+  },
+  {
+    "brokenImages": 0,
+    "buyAndNavSeparate": true,
+    "client": 1265,
+    "locale": "ru",
+    "screen": "cart",
+    "scroll": 1265,
+    "width": 1280
+  },
+  {
+    "brokenImages": 0,
+    "buyAndNavSeparate": true,
+    "client": 305,
+    "locale": "ru",
+    "screen": "checkout",
+    "scroll": 305,
+    "width": 320
+  },
+  {
+    "brokenImages": 0,
+    "buyAndNavSeparate": true,
+    "client": 360,
+    "locale": "ru",
+    "screen": "checkout",
+    "scroll": 360,
+    "width": 375
+  },
+  {
+    "brokenImages": 0,
+    "buyAndNavSeparate": true,
+    "client": 375,
+    "locale": "ru",
+    "screen": "checkout",
+    "scroll": 375,
+    "width": 390
+  },
+  {
+    "brokenImages": 0,
+    "buyAndNavSeparate": true,
+    "client": 415,
+    "locale": "ru",
+    "screen": "checkout",
+    "scroll": 415,
+    "width": 430
+  },
+  {
+    "brokenImages": 0,
+    "buyAndNavSeparate": true,
+    "client": 753,
+    "locale": "ru",
+    "screen": "checkout",
+    "scroll": 753,
+    "width": 768
+  },
+  {
+    "brokenImages": 0,
+    "buyAndNavSeparate": true,
+    "client": 1265,
+    "locale": "ru",
+    "screen": "checkout",
+    "scroll": 1265,
+    "width": 1280
+  }
+]

@@ -1,0 +1,1545 @@
+@font-face {
+  font-family: VoyeyInter;
+  src: url("../fonts/InterVariable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+}
+:root {
+  font-family: VoyeyInter, Inter, Arial, sans-serif;
+  color: #202126;
+  background: #fff;
+  font-synthesis: none;
+  font-weight: 400;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+button,
+input,
+select {
+  font: inherit;
+}
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+button,
+a,
+input,
+select,
+summary {
+  -webkit-tap-highlight-color: transparent;
+}
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+summary:focus-visible {
+  outline: 2px solid #b71c3c;
+  outline-offset: 4px;
+}
+button {
+  color: inherit;
+}
+img {
+  display: block;
+  max-width: 100%;
+}
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+h1 {
+  font-size: 24px;
+  line-height: 1.25;
+  letter-spacing: -0.6px;
+}
+h2 {
+  font-size: 19px;
+  letter-spacing: -0.35px;
+}
+h3 {
+  font-size: 16px;
+}
+small {
+  font-size: 12px;
+}
+fieldset {
+  min-width: 0;
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+legend {
+  font-size: 18px;
+  font-weight: 600;
+  padding: 0 0 12px;
+}
+input,
+select {
+  min-width: 0;
+  width: 100%;
+  border: 1px solid #e5e7ed;
+  background: #f7f7f8;
+  border-radius: 13px;
+  min-height: 48px;
+  padding: 12px;
+  font-size: 16px;
+  color: #202126;
+}
+input[type="checkbox"],
+input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  accent-color: #d31532;
+  flex-shrink: 0;
+}
+summary {
+  cursor: pointer;
+  list-style: none;
+}
+summary::-webkit-details-marker {
+  display: none;
+}
+.voyey-demo {
+  --vy-red: #d31532;
+  --vy-burgundy: #b71c3c;
+  --vy-brown: #4a2c1a;
+  --vy-pink: #fff1f1;
+  --vy-gray: #f7f7f8;
+  --vy-muted: #697386;
+  --vy-radius: 20px;
+  --vy-radius-small: 16px;
+  --vy-radius-large: 24px;
+  --vy-space-small: 8px;
+  --vy-space-large: 24px;
+  --vy-font-small: 12px;
+  --vy-font-body: 14px;
+  --vy-font-title: 24px;
+  --vy-gap: 16px;
+  --vy-shadow: 0 4px 20px #272b4210;
+  --vy-glow: 0 3px 14px #d3153225;
+  --vy-blur: 16px;
+  --vy-control: 48px;
+  --vy-safe-bottom: max(
+    env(safe-area-inset-bottom, 0px),
+    var(--tg-safe-area-inset-bottom, 0px),
+    var(--tg-content-safe-area-inset-bottom, 0px)
+  );
+  --vy-safe-top: max(
+    env(safe-area-inset-top, 0px),
+    var(--tg-content-safe-area-inset-top, 0px)
+  );
+  min-height: var(--tg-viewport-stable-height, 100dvh);
+  padding-top: var(--vy-safe-top);
+  background: #fff;
+  padding-bottom: calc(118px + var(--vy-safe-bottom));
+  line-height: 1.5;
+}
+.vy-shell {
+  max-width: 1120px;
+  margin: auto;
+  padding: 0 20px;
+}
+.vy-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 70px;
+}
+.vy-header h1 {
+  font-size: 18px;
+  text-align: center;
+  flex: 1;
+  letter-spacing: -0.3px;
+}
+.vy-header-actions {
+  display: flex;
+  gap: 5px;
+  margin-left: auto;
+}
+.vy-demo-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.1px;
+  color: var(--vy-muted);
+  margin: 2px 0 14px;
+}
+.vy-home-header .vy-logo {
+  margin-right: auto;
+}
+.vy-logo {
+  display: block;
+  position: relative;
+  width: 134px;
+  height: 40px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.vy-logo img {
+  position: absolute;
+  width: 144%;
+  max-width: none;
+  left: -21.5%;
+  top: -132%;
+}
+.vy-symbol {
+  display: block;
+  position: relative;
+  width: 70px;
+  height: 70px;
+  overflow: hidden;
+}
+.vy-symbol img {
+  position: absolute;
+  width: 260%;
+  max-width: none;
+  left: -80%;
+  top: -75%;
+}
+.vy-glass {
+  background: #ffffffde;
+  border: 1px solid #eceef4;
+  box-shadow: var(--vy-shadow);
+  backdrop-filter: blur(var(--vy-blur));
+  -webkit-backdrop-filter: blur(var(--vy-blur));
+  border-radius: var(--vy-radius);
+}
+.vy-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: var(--vy-control);
+  padding: 12px 20px;
+  border: 1px solid transparent;
+  border-radius: var(--vy-radius-large);
+  background: var(--vy-red);
+  color: #fff;
+  font-weight: 600;
+  font-size: var(--vy-font-body);
+  box-shadow: var(--vy-glow);
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
+  line-height: 1.4;
+}
+.vy-button:active:not(:disabled),
+.vy-icon-button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+.vy-secondary {
+  background: #fff;
+  color: var(--vy-burgundy);
+  border-color: #f2cbd2;
+  box-shadow: 0 2px 10px #d3153210;
+}
+.vy-full {
+  width: 100%;
+}
+.vy-icon-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  height: 44px;
+  padding: 10px;
+  border: 1px solid #eceef4;
+  border-radius: 50%;
+  background: #ffffffed;
+  color: #526078;
+  flex-shrink: 0;
+}
+.vy-icon-button.is-active {
+  color: var(--vy-red);
+  background: var(--vy-pink);
+  border-color: #f1b9c3;
+  box-shadow: var(--vy-glow);
+}
+.vy-count {
+  position: absolute;
+  right: 0;
+  top: 0;
+  min-width: 17px;
+  min-height: 17px;
+  padding: 0 4px;
+  border-radius: 10px;
+  background: var(--vy-red);
+  color: #fff;
+  font-size: 10px;
+  line-height: 17px;
+  box-shadow: 0 0 0 2px #fff;
+}
+.vy-price {
+  white-space: nowrap;
+  font-size: 16px;
+  font-weight: 650;
+  color: #191c24;
+  letter-spacing: -0.35px;
+}
+.vy-currency {
+  font-size: 0.78em;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.vy-price-large {
+  font-size: 29px;
+  display: inline-block;
+  margin: 8px 0 18px;
+}
+.vy-caption {
+  font-size: 13px;
+  color: var(--vy-muted);
+  line-height: 1.6;
+}
+.vy-error {
+  color: #a41630;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.vy-success {
+  color: #236e3c;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.vy-text-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 0;
+  border: 0;
+  background: transparent;
+  color: var(--vy-red);
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.vy-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f7f7f8;
+  min-height: 46px;
+  padding: 0 12px;
+  border-radius: 16px;
+  color: var(--vy-muted);
+  margin-bottom: 14px;
+}
+.vy-search input {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  min-height: 46px;
+  padding: 8px 0;
+  font-size: 14px;
+}
+.vy-search .vy-icon-button {
+  height: 36px;
+  min-width: 36px;
+  padding: 6px;
+  background: transparent;
+  border: 0;
+}
+.vy-search input::-webkit-search-cancel-button {
+  display: none;
+}
+.vy-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 22px;
+  min-height: 224px;
+  background: #f5e8de;
+  margin: 12px 0 18px;
+}
+.vy-hero > img {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 61%;
+  object-fit: cover;
+}
+.vy-hero-copy {
+  position: relative;
+  padding: 18px 16px;
+  width: 58%;
+  z-index: 1;
+}
+.vy-hero h1 {
+  font-size: 23px;
+  color: var(--vy-brown);
+  line-height: 1.16;
+  letter-spacing: -1px;
+}
+.vy-hero em {
+  font-style: normal;
+  color: var(--vy-red);
+  display: inline;
+}
+.vy-hero p {
+  font-size: 12px;
+  line-height: 1.4;
+  margin: 8px 0 12px;
+  color: #5d493f;
+  max-width: 200px;
+}
+.vy-hero .vy-button {
+  font-size: 12px;
+  padding: 10px 14px;
+  min-height: 42px;
+  white-space: nowrap;
+}
+.vy-dots {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+  z-index: 2;
+}
+.vy-dots button {
+  width: 24px;
+  height: 22px;
+  border: 0;
+  padding: 7px;
+  background: transparent;
+}
+.vy-dots button::after {
+  content: "";
+  display: block;
+  width: 7px;
+  height: 7px;
+  background: #ffffffb0;
+  border-radius: 50%;
+}
+.vy-dots button[aria-pressed="true"]::after {
+  background: var(--vy-red);
+}
+.vy-categories {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 0 0 10px;
+}
+.vy-categories button {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  flex: 1 0 60px;
+  min-width: max-content;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  color: #596274;
+  line-height: 1.3;
+}
+.vy-categories img {
+  width: 58px;
+  height: 58px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 1px solid #f7e1d4;
+}
+.vy-section {
+  margin-top: 22px;
+}
+.vy-section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.vy-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.vy-product-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #eceef3;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 3px 15px #29355405;
+}
+.vy-card-image {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 17px 17px 0 0;
+  background: #f9f4ef;
+}
+.vy-image-link {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.vy-image-link img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.25s;
+}
+.vy-card-heart {
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  min-width: 36px;
+  height: 36px;
+  padding: 7px;
+}
+.vy-badge {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 14px;
+  background: #e8fbe7;
+  color: #217236;
+  font-size: 11px;
+  line-height: 1.3;
+}
+.vy-card-image .vy-badge {
+  position: absolute;
+  left: 7px;
+  top: 8px;
+  max-width: calc(100% - 51px);
+  pointer-events: none;
+}
+.vy-preorder {
+  color: #b21b3b;
+  background: #fff0f0;
+}
+.vy-unavailable {
+  background: #eef0f4;
+  color: #687286;
+}
+.vy-card-body {
+  padding: 8px 10px 12px;
+}
+.vy-card-price {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2px;
+}
+.vy-card-price .vy-price {
+  font-size: 15px;
+}
+.vy-add-icon {
+  color: var(--vy-red);
+  min-width: 38px;
+  height: 38px;
+  padding: 8px;
+  border-color: #f7d7dc;
+  box-shadow: 0 3px 9px #d3153212;
+}
+.vy-product-name {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  font-size: 13px;
+  text-align: left;
+  font-weight: 500;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+  color: #333c4a;
+}
+.vy-card-body > .vy-product-name {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 37px;
+  margin-top: 3px;
+}
+.vy-chip-rail {
+  display: flex;
+  gap: 7px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 3px 1px 13px;
+}
+.vy-chip {
+  white-space: nowrap;
+  min-height: 38px;
+  padding: 8px 13px;
+  border-radius: 20px;
+  border: 1px solid #eceef3;
+  background: #f7f7f8;
+  font-size: 12px;
+}
+.vy-chip.is-selected {
+  color: var(--vy-red);
+  border-color: #f5bec8;
+  background: var(--vy-pink);
+  box-shadow: var(--vy-glow);
+}
+.vy-toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.vy-toolbar > label {
+  display: flex;
+  align-items: center;
+  color: var(--vy-muted);
+  font-size: 12px;
+  gap: 7px;
+  min-width: 0;
+}
+.vy-toolbar select {
+  width: auto;
+  min-width: 0;
+  max-width: 155px;
+  background: transparent;
+  border: 0;
+  padding: 8px 16px 8px 0;
+  font-size: 12px;
+  min-height: 44px;
+}
+.vy-toolbar .vy-button {
+  min-height: 40px;
+  padding: 8px 12px;
+  font-size: 12px;
+}
+.vy-toolbar + .vy-caption {
+  margin-bottom: 12px;
+}
+.vy-bottom-nav {
+  position: fixed;
+  z-index: 20;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(10px + var(--vy-safe-bottom));
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  width: calc(100% - 24px);
+  max-width: 520px;
+  padding: 6px;
+  border-radius: 30px;
+  min-height: 72px;
+  box-shadow: 0 3px 30px #24305714;
+}
+.vy-bottom-nav button {
+  border: 1px solid transparent;
+  border-radius: 24px;
+  background: transparent;
+  color: #657085;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 11px;
+  line-height: 1.2;
+  min-height: 58px;
+  min-width: 0;
+  padding: 5px 2px;
+  overflow-wrap: anywhere;
+}
+.vy-bottom-nav .is-active {
+  background: #fff6f6;
+  color: var(--vy-red);
+  border-color: #ffe0e4;
+  box-shadow: var(--vy-glow);
+}
+.vy-nav-icon {
+  position: relative;
+}
+.vy-nav-icon .vy-count {
+  right: -8px;
+  top: -5px;
+}
+.vy-toast {
+  position: fixed;
+  z-index: 50;
+  bottom: calc(180px + var(--vy-safe-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 420px;
+  width: calc(100% - 36px);
+  padding: 15px 18px;
+  border: 1px solid #e4e5e9;
+  border-radius: 17px;
+  box-shadow: 0 8px 30px #20212620;
+  background: #fff;
+  color: var(--vy-brown);
+  font-size: 14px;
+}
+.vy-dialog {
+  border: 1px solid #e9eaf0;
+  border-radius: 24px;
+  padding: 22px;
+  max-width: 480px;
+  width: calc(100% - 24px);
+  max-height: 85dvh;
+  box-shadow: 0 18px 70px #22263130;
+  color: #202126;
+}
+.vy-dialog::backdrop {
+  background: #24273450;
+  backdrop-filter: blur(4px);
+}
+.vy-dialog-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.vy-dialog > p {
+  line-height: 1.7;
+  color: #596274;
+}
+.vy-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.vy-form label,
+.vy-measurements label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: #596274;
+}
+.vy-field-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.vy-field-pair input {
+  width: 100%;
+}
+.vy-field-pair input[type="radio"] {
+  width: 18px;
+}
+.vy-empty {
+  text-align: center;
+  max-width: 420px;
+  margin: 50px auto;
+  padding: 25px 15px;
+}
+.vy-empty-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  background: var(--vy-pink);
+  color: var(--vy-burgundy);
+  display: grid;
+  place-items: center;
+}
+.vy-empty h2 {
+  margin-bottom: 12px;
+}
+.vy-empty p {
+  font-size: 14px;
+  color: var(--vy-muted);
+  margin-bottom: 24px;
+}
+.vy-narrow {
+  max-width: 630px;
+  margin: 0 auto;
+}
+.vy-segmented {
+  display: flex;
+  background: #f2f3f6;
+  border: 1px solid #eceef3;
+  border-radius: 24px;
+  padding: 4px;
+  gap: 4px;
+  margin-bottom: 14px;
+}
+.vy-segmented button {
+  border: 1px solid transparent;
+  background: transparent;
+  min-height: 42px;
+  border-radius: 22px;
+  flex: 1;
+  padding: 8px;
+  font-size: 13px;
+  line-height: 1.35;
+}
+.vy-segmented .is-selected {
+  background: #fff5f5;
+  color: var(--vy-red);
+  border-color: #f1c0c9;
+  box-shadow: var(--vy-glow);
+  font-weight: 600;
+}
+.vy-gallery {
+  min-width: 0;
+}
+.vy-main-photo {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 23px;
+  background: #f7f0e9;
+}
+.vy-main-photo > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.25s;
+}
+.vy-photo-1 > img {
+  transform: scale(1.4);
+  transform-origin: 60% 40%;
+}
+.vy-photo-2 > img {
+  transform: scale(1.8);
+  transform-origin: 40% 70%;
+}
+.vy-gallery-actions {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  justify-content: space-between;
+}
+.vy-photo-counter {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: #3d332a9c;
+  color: #fff;
+  border-radius: 14px;
+  padding: 3px 10px;
+  font-size: 12px;
+}
+.vy-thumbnails {
+  display: flex;
+  gap: 9px;
+  margin: 10px 0 18px;
+}
+.vy-thumbnails button {
+  width: 58px;
+  height: 58px;
+  overflow: hidden;
+  border: 1px solid #e7e8ed;
+  border-radius: 12px;
+  padding: 3px;
+  background: #fff;
+}
+.vy-thumbnails img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.vy-thumbnails .is-selected {
+  border-color: var(--vy-red);
+  box-shadow: var(--vy-glow);
+}
+.vy-thumb-1 img {
+  transform: scale(1.3);
+}
+.vy-thumb-2 img {
+  transform: scale(1.7);
+}
+.vy-title-badge {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.vy-title-badge h1 {
+  font-size: 23px;
+}
+.vy-title-badge .vy-badge {
+  flex-shrink: 0;
+  max-width: 40%;
+  margin-top: 4px;
+}
+.vy-field-heading {
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+.vy-field-heading > span {
+  color: var(--vy-muted);
+  margin-left: 7px;
+}
+.vy-variant-options {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.vy-variant {
+  min-height: 45px;
+  min-width: 45px;
+  border: 1px solid #e5e7ed;
+  border-radius: 13px;
+  background: #fff;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+}
+.vy-variant.is-selected {
+  border-color: var(--vy-red);
+  box-shadow: var(--vy-glow);
+}
+.vy-swatch {
+  height: 32px;
+  width: 32px;
+  display: block;
+  border-radius: 9px;
+  border: 1px solid #0000000d;
+}
+.vy-accordion {
+  border: 1px solid #eceef4;
+  background: #fafbfc;
+  border-radius: 15px;
+  margin-top: 9px;
+  padding: 14px;
+  font-size: 13px;
+}
+.vy-accordion summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+.vy-accordion summary::after {
+  content: "⌄";
+  color: #657085;
+}
+.vy-accordion[open] summary {
+  margin-bottom: 12px;
+}
+.vy-accordion dl {
+  margin: 0;
+}
+.vy-accordion dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid #eceef4;
+}
+.vy-accordion dt {
+  color: var(--vy-muted);
+}
+.vy-accordion dd {
+  margin: 0;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+.vy-product-info > .vy-caption {
+  margin: 10px 0;
+}
+.vy-measurements {
+  margin: 16px 0;
+}
+.vy-measurements legend {
+  font-size: 14px;
+}
+.vy-buy-bar {
+  position: fixed;
+  z-index: 19;
+  bottom: calc(96px + var(--vy-safe-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 24px);
+  max-width: 600px;
+  padding: 7px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.vy-buy-bar > .vy-button {
+  flex: 1;
+  padding: 12px 10px;
+  font-size: 13px;
+}
+.vy-quantity {
+  display: inline-flex;
+  align-items: center;
+  height: 43px;
+  overflow: hidden;
+  border-radius: 18px;
+  flex-shrink: 0;
+}
+.vy-quantity .vy-icon-button {
+  min-width: 35px;
+  width: 35px;
+  height: 40px;
+  border: 0;
+  border-radius: 0;
+  padding: 8px;
+  box-shadow: none;
+  background: transparent;
+}
+.vy-quantity output {
+  width: 24px;
+  text-align: center;
+  font-size: 14px;
+}
+.voyey-demo[data-screen="product"] {
+  padding-bottom: calc(210px + var(--vy-safe-bottom));
+}
+.vy-cart-row {
+  display: flex;
+  gap: 12px;
+  padding: 18px 0;
+  border-bottom: 1px solid #eceef3;
+  align-items: flex-start;
+}
+.vy-row-image {
+  border: 0;
+  padding: 0;
+  background: #f7f0e9;
+  border-radius: 13px;
+  width: 86px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.vy-row-image img {
+  aspect-ratio: 0.84;
+  object-fit: cover;
+  width: 100%;
+}
+.vy-row-info {
+  flex: 1;
+  min-width: 0;
+}
+.vy-row-info > .vy-price {
+  display: block;
+  margin: 5px 0 8px;
+}
+.vy-row-info .vy-caption {
+  margin-top: 3px;
+}
+.vy-cart-row > .vy-icon-button {
+  border: 0;
+  color: var(--vy-red);
+  height: 36px;
+  min-width: 32px;
+  padding: 6px;
+}
+.vy-cart-summary {
+  margin-top: 20px;
+  padding: 16px;
+}
+.vy-promo-field {
+  display: flex;
+  gap: 8px;
+  background: #f7f7f8;
+  border: 1px solid #e5e7ed;
+  border-radius: 15px;
+  padding: 4px;
+}
+.vy-promo-field input {
+  border: 0;
+  background: transparent;
+  min-height: 40px;
+  padding: 7px;
+  font-size: 14px;
+}
+.vy-promo-field .vy-button {
+  font-size: 12px;
+  padding: 8px 12px;
+  min-height: 40px;
+  color: #30323d;
+  border-color: #e5e7ed;
+  box-shadow: none;
+}
+.vy-promo .vy-error,
+.vy-promo .vy-success {
+  margin-top: 9px;
+}
+.vy-promo-help {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--vy-muted);
+}
+.vy-promo-help p {
+  padding: 7px 0;
+  color: #596274;
+}
+.vy-summary {
+  padding: 18px 0;
+}
+.vy-summary > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 11px;
+  font-size: 13px;
+  color: var(--vy-muted);
+}
+.vy-summary .vy-price {
+  font-size: 14px;
+}
+.vy-summary .vy-total,
+.vy-summary .vy-first {
+  padding-top: 12px;
+  margin-top: 14px;
+  border-top: 1px solid #eceef3;
+  color: #202126;
+  font-size: 17px;
+}
+.vy-summary .vy-total .vy-price,
+.vy-summary .vy-first .vy-price {
+  font-size: 19px;
+}
+.vy-panel {
+  border: 1px solid #eceef3;
+  border-radius: 18px;
+  padding: 17px;
+  background: #fcfcfd;
+}
+.vy-panel > legend {
+  padding: 0 7px;
+}
+.vy-panel h2 {
+  font-size: 16px;
+}
+.vy-checkout .vy-panel .vy-section-title {
+  margin-bottom: 10px;
+}
+.vy-checkout .vy-panel .vy-section-title h2 {
+  font-size: 14px;
+}
+.vy-checkout-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  font-size: 13px;
+  padding: 9px 0;
+  border-bottom: 1px solid #eceef3;
+}
+.vy-checkout-line:last-child {
+  border: 0;
+}
+.vy-checkout-line .vy-price {
+  font-size: 13px;
+}
+.vy-checkout label.vy-radio {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid #e6e7ed;
+  border-radius: 13px;
+  background: #f7f7f8;
+  min-height: 52px;
+  padding: 9px;
+  font-size: 12px;
+  color: #343a45;
+}
+.vy-radio:has(input:checked) {
+  border-color: #f3aebd !important;
+  background: #fff5f5 !important;
+}
+.vy-panel > .vy-caption {
+  margin: 12px 0 0;
+}
+.vy-payment-option {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  color: var(--vy-burgundy);
+  font-size: 14px;
+}
+.vy-payment-option svg:last-child {
+  margin-left: auto;
+}
+.vy-panel .vy-segmented {
+  margin-top: 18px;
+}
+.vy-terms {
+  flex-direction: row !important;
+  align-items: flex-start;
+  gap: 12px !important;
+  font-size: 13px !important;
+}
+.vy-terms small {
+  display: block;
+  margin-top: 7px;
+  line-height: 1.6;
+  color: var(--vy-muted);
+}
+.vy-checkout .vy-summary {
+  padding: 0;
+}
+.vy-profile {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.vy-profile > .vy-symbol {
+  margin: 12px auto 0;
+}
+.vy-profile > h1,
+.vy-profile > p {
+  text-align: center;
+}
+.vy-profile > p {
+  color: var(--vy-muted);
+  font-size: 14px;
+}
+.vy-profile .vy-panel h2 {
+  margin-bottom: 15px;
+}
+.vy-profile .vy-segmented {
+  margin-bottom: 0;
+}
+.vy-order-link {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #eceef3;
+  padding: 13px 0;
+  font-size: 14px;
+}
+.vy-order-link small {
+  display: block;
+  color: var(--vy-muted);
+  margin-top: 4px;
+}
+.vy-eyebrow {
+  color: var(--vy-muted);
+  font-size: 12px;
+  letter-spacing: 0.7px;
+}
+.vy-payment > h2 {
+  margin: 14px 0 0;
+}
+.vy-payment > .vy-badge {
+  display: table;
+  margin-bottom: 20px;
+}
+.vy-timer {
+  padding: 20px;
+  display: flex;
+  gap: 15px;
+  margin-bottom: 12px;
+}
+.vy-timer > span {
+  font-size: 13px;
+  color: var(--vy-muted);
+}
+.vy-timer strong {
+  display: block;
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--vy-brown);
+  font-variant-numeric: tabular-nums;
+}
+.vy-timer small {
+  font-size: 12px;
+}
+.vy-payment > .vy-panel {
+  margin: 22px 0;
+}
+.vy-payment > .vy-panel h3 {
+  margin: 10px 0;
+}
+.vy-payment > .vy-panel p,
+.vy-payment-status p {
+  font-size: 13px;
+  color: var(--vy-muted);
+}
+.vy-payment-status {
+  border: 1px solid #e7e9ef;
+  background: #f7f7f8;
+  border-radius: 18px;
+  padding: 18px;
+  margin-bottom: 18px;
+}
+.vy-payment-status h3 {
+  margin: 8px 0;
+}
+.vy-payment-status.vy-success {
+  display: block;
+  background: #f1faf0;
+}
+.vy-payment > p {
+  margin-bottom: 12px;
+}
+.vy-file {
+  border: 1px dashed #e0abb6;
+  background: #fff8f8;
+  padding: 18px;
+  border-radius: 16px;
+  color: var(--vy-burgundy);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 14px;
+}
+.vy-file input {
+  font-size: 12px;
+  background: transparent;
+  padding: 0;
+  border: 0;
+  min-height: 25px;
+}
+.vy-file.is-disabled {
+  opacity: 0.5;
+}
+.vy-receipt-preview {
+  width: 120px;
+  max-height: 140px;
+  object-fit: contain;
+  border-radius: 12px;
+}
+.vy-simulator {
+  border: 1px solid #e5e7ed;
+  border-radius: 18px;
+  padding: 16px;
+  margin-top: 24px;
+  font-size: 13px;
+}
+.vy-simulator > p {
+  color: var(--vy-muted);
+  margin: 12px 0;
+}
+.vy-simulator .vy-button {
+  font-size: 12px;
+}
+.vy-payment > .vy-form {
+  margin-bottom: 20px;
+}
+.vy-spinner {
+  height: 20px;
+  width: 20px;
+  border: 2px solid #ffffff60;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: vy-spin 0.7s linear infinite;
+}
+@keyframes vy-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.voyey-demo[data-keyboard="true"] .vy-bottom-nav,
+.voyey-demo[data-keyboard="true"] .vy-buy-bar {
+  visibility: hidden;
+}
+@media (hover: hover) {
+  .vy-button:hover:not(:disabled) {
+    box-shadow: 0 4px 20px #d3153235;
+  }
+  .vy-image-link:hover img {
+    transform: scale(1.03);
+  }
+  .vy-product-name:hover {
+    color: var(--vy-red);
+  }
+}
+@media (max-width: 380px) {
+  .vy-shell {
+    padding: 0 12px;
+  }
+  .vy-hero {
+    min-height: 220px;
+  }
+  .vy-hero-copy {
+    padding: 16px 14px;
+    width: 60%;
+  }
+  .vy-hero h1 {
+    font-size: 21px;
+  }
+  .vy-hero p {
+    font-size: 12px;
+  }
+  .vy-hero .vy-button {
+    font-size: 10px;
+    padding: 8px 10px;
+  }
+  .vy-hero > img {
+    width: 57%;
+  }
+  .vy-header-actions {
+    gap: 2px;
+  }
+  .vy-header-actions .vy-icon-button {
+    min-width: 40px;
+    width: 40px;
+    height: 40px;
+  }
+  .vy-logo {
+    width: 120px;
+    height: 36px;
+  }
+  .vy-grid {
+    gap: 9px;
+  }
+  .vy-card-body {
+    padding: 7px 8px 10px;
+  }
+  .vy-card-price .vy-price {
+    font-size: 13px;
+  }
+  .vy-card-price .vy-add-icon {
+    min-width: 32px;
+    height: 34px;
+    padding: 6px;
+  }
+  .vy-title-badge h1 {
+    font-size: 21px;
+  }
+  .vy-row-image {
+    width: 70px;
+  }
+  .vy-cart-row {
+    gap: 9px;
+  }
+  .vy-cart-summary {
+    padding: 12px;
+  }
+  .vy-toolbar {
+    gap: 4px;
+  }
+  .vy-toolbar > label {
+    font-size: 0;
+  }
+  .vy-toolbar select {
+    font-size: 12px;
+    max-width: 165px;
+  }
+  .vy-categories {
+    gap: 8px;
+  }
+  .vy-buy-bar > .vy-button {
+    font-size: 12px;
+  }
+  .vy-bottom-nav button {
+    font-size: 10px;
+  }
+  .vy-badge {
+    font-size: 10px;
+  }
+}
+@media (min-width: 600px) {
+  .vy-hero {
+    min-height: 310px;
+  }
+  .vy-hero-copy {
+    padding: 40px;
+    width: 50%;
+  }
+  .vy-hero h1 {
+    font-size: 36px;
+    max-width: 350px;
+  }
+  .vy-hero p {
+    font-size: 15px;
+    max-width: 270px;
+  }
+  .vy-hero .vy-button {
+    font-size: 14px;
+  }
+  .vy-categories {
+    justify-content: flex-start;
+    gap: 26px;
+  }
+  .vy-categories button {
+    flex: none;
+    min-width: 80px;
+  }
+  .vy-categories img {
+    width: 70px;
+    height: 70px;
+  }
+  .vy-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+  }
+  .vy-product-detail {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+  }
+  .vy-title-badge {
+    flex-direction: column;
+    gap: 0;
+  }
+  .vy-title-badge .vy-badge {
+    max-width: none;
+  }
+  .vy-product-info > .vy-price {
+    margin-top: 12px;
+  }
+  .vy-search {
+    max-width: 650px;
+  }
+  .vy-header {
+    min-height: 82px;
+  }
+  .vy-dialog {
+    padding: 26px;
+  }
+}
+@media (min-width: 960px) {
+  .vy-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .vy-hero > img {
+    object-position: center 55%;
+    width: 55%;
+  }
+  .vy-hero-copy {
+    width: 50%;
+    padding: 40px 45px;
+  }
+  .vy-hero h1 {
+    font-size: 39px;
+  }
+  .vy-section {
+    margin-top: 32px;
+  }
+  .vy-main-photo {
+    max-height: 560px;
+  }
+  .vy-title-badge {
+    flex-direction: row;
+    gap: 14px;
+  }
+  .vy-title-badge .vy-badge {
+    max-width: 40%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
