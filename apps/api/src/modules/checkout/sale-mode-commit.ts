@@ -13,7 +13,11 @@ const selection = splitFinanceSelectionSchema
 
 /** Internal opt-in only. No HTTP registration or environment activation switch. */
 export class SaleModeCheckoutCommit {
-  constructor(private readonly enabled = false) {}
+  constructor(
+    private readonly enabled = false,
+    // New selected checkouts always opt into deadlines. Explicit false is historical V1 compatibility only.
+    private readonly reservationLifecycle = true,
+  ) {}
   async create(userId: string, key: string, value: unknown) {
     if (!this.enabled)
       throw new HttpError(503, "Sale-mode checkout is disabled");
@@ -21,10 +25,10 @@ export class SaleModeCheckoutCommit {
     if (!parsed.success)
       throw new HttpError(400, "Select exactly one sale mode");
     const { saleMode, ...request } = parsed.data;
-    return new LinkedCheckoutCommit(true, saleMode).create(
-      userId,
-      key,
-      request,
-    );
+    return new LinkedCheckoutCommit(
+      true,
+      saleMode,
+      this.reservationLifecycle,
+    ).create(userId, key, request);
   }
 }

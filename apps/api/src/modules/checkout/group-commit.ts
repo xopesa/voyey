@@ -12,6 +12,8 @@ import { promoForCheckout } from "../marketing/promo-codes.js";
 import { createPublicOrderId } from "./domain.js";
 import { database } from "@stenzo/database";
 import { readCheckoutGroup } from "./group-store.js";
+import { FIRST_WINDOW_MS } from "./first-window.js";
+import { quoteReservedPromo } from "../marketing/promo-reservations.js";
 
 const schema = splitFinanceSelectionSchema
   .extend({ recipient: recipientSchema })
@@ -23,6 +25,7 @@ export class LinkedCheckoutCommit {
   constructor(
     private readonly enabled = false,
     private readonly selectedMode?: CheckoutSaleMode,
+    private readonly reservationLifecycle = false,
   ) {}
   async create(userId: string, key: string, value: unknown) {
     if (!this.enabled)
@@ -33,6 +36,11 @@ export class LinkedCheckoutCommit {
       throw new HttpError(400, "Invalid linked checkout request");
     key = parsedKey.data;
     const data = request.data;
+    if (this.reservationLifecycle && !this.selectedMode)
+      throw new HttpError(
+        400,
+        "Promo lifecycle requires one selected sale mode",
+      );
     if (
       this.selectedMode !== undefined &&
       !["IN_STOCK", "PREORDER"].includes(this.selectedMode)
@@ -41,7 +49,9 @@ export class LinkedCheckoutCommit {
     // Canonical request intent excludes today's cart/catalog so replay never consumes a new cart.
     const requestFingerprint = fingerprint({
       operation: this.selectedMode
-        ? "VOYEY_SELECTED_MODE_V1"
+        ? this.reservationLifecycle
+          ? "VOYEY_RESERVED_MODE_V1"
+          : "VOYEY_SELECTED_MODE_V1"
         : "VOYEY_LINKED_V1",
       ...(this.selectedMode ? { saleMode: this.selectedMode } : {}),
       recipient: data.recipient,
@@ -86,16 +96,26 @@ export class LinkedCheckoutCommit {
         throw new HttpError(409, "New checkout requires positive goods prices");
       let discount = 0,
         promoId: string | undefined;
+      let advanced: Awaited<ReturnType<typeof quoteReservedPromo>> | undefined;
       if (data.promoCode !== undefined) {
-        const quote = await promoForCheckout(
-          userId,
-          data.promoCode,
-          plan.subtotal,
-          now,
-        );
-        if (!quote.quote.valid) throw new HttpError(409, quote.quote.reason);
-        discount = quote.quote.discountAmount;
-        promoId = quote.promoCodeId;
+        const code = data.promoCode.trim().toUpperCase();
+        const record = this.reservationLifecycle
+          ? await prisma.promoCode.findUnique({ where: { code } })
+          : null;
+        if (record?.engineVersion === 2) {
+          advanced = await quoteReservedPromo(userId, code, cart, plan, now);
+          discount = advanced.quote.discountAmount;
+        } else {
+          const quote = await promoForCheckout(
+            userId,
+            data.promoCode,
+            plan.subtotal,
+            now,
+          );
+          if (!quote.quote.valid) throw new HttpError(409, quote.quote.reason);
+          discount = quote.quote.discountAmount;
+          promoId = quote.promoCodeId;
+        }
       }
       const finance = calculateSplitFinance(
         plan,
@@ -162,6 +182,27 @@ export class LinkedCheckoutCommit {
             { version: 1, ...item },
             now,
           );
+        }
+        if (this.reservationLifecycle) {
+          b.sql(
+            "INSERT INTO CheckoutFirstWindow(orderId,checkoutGroupId,createdAt,expiresAt) VALUES(?,?,?,?)",
+            orderId,
+            groupId,
+            now,
+            now + FIRST_WINDOW_MS,
+          );
+          if (advanced)
+            b.sql(
+              "INSERT INTO PromoReservation(id,promoCodeId,checkoutGroupId,orderId,userId,discountAmount,policySnapshot,createdAt) VALUES(?,?,?,?,?,?,?,?)",
+              crypto.randomUUID(),
+              advanced.promoCodeId,
+              groupId,
+              orderId,
+              userId,
+              discount,
+              advanced.snapshot,
+              now,
+            );
         }
         b.insert("AuditLog", {
           actorId: userId,

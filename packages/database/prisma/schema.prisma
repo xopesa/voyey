@@ -844,3 +844,37 @@ model PromoPolicyExclusion {
  saleModes String
  @@id([promoCodeId,productId,saleModes])
 }
+
+// Internal append-only promo lifecycle; authoritative constraints live in D1 0028.
+model CheckoutFirstWindow {
+ orderId String @id
+ checkoutGroupId String @unique
+ createdAt DateTime
+ expiresAt DateTime
+}
+model CheckoutFirstExtension {
+ orderId String @id
+ paymentId String @unique
+ createdBy String
+ decisionAt DateTime
+ expiresAt DateTime
+}
+model PromoReservation {
+ id String @id
+ promoCodeId String
+ checkoutGroupId String @unique
+ orderId String @unique
+ userId String
+ discountAmount Int
+ policySnapshot Json
+ createdAt DateTime
+}
+model PromoReservationEvent {
+ id String @id
+ reservationId String
+ kind String
+ actorId String
+ createdAt DateTime
+ paymentLedgerId String? @unique
+ cancellationId String? @unique
+}

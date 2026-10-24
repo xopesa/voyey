@@ -129,7 +129,7 @@ async function create(
   extra: Record<string, unknown> = {},
   userId = "buyer",
 ) {
-  return new SaleModeCheckoutCommit(true).create(userId, key, {
+  return new SaleModeCheckoutCommit(true, false).create(userId, key, {
     saleMode,
     recipient,
     ...(saleMode === "PREORDER" ? { preorderPercent: 50 } : {}),
@@ -415,7 +415,7 @@ scenario(
       { saleMode: "IN_STOCK", discountAmount: 100 },
     ])
       await assert.rejects(
-        new SaleModeCheckoutCommit(true).create("buyer", randomUUID(), {
+        new SaleModeCheckoutCommit(true, false).create("buyer", randomUUID(), {
           recipient,
           ...v,
         }),

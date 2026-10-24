@@ -16,6 +16,7 @@ import {
   type CheckoutFinancialState,
 } from "./payment-state.js";
 import type { FinalInvoiceRow } from "./preorder-finance.js";
+import { assertFirstSubmission, readFirstWindow } from "./first-window.js";
 
 const amount = z.number().int().min(1).max(2147483647);
 const claimSchema = z.object({ declaredAmount: amount }).strict();
@@ -127,7 +128,11 @@ export class LinkedCheckoutPayments {
   async state(authorization: string | undefined, orderId: string) {
     this.gate();
     const userId = await this.subject(authorization);
-    return atomic(() => this.buyer(userId, orderId));
+    return atomic(async () => {
+      const state = await this.buyer(userId, orderId);
+      const window = await readFirstWindow(orderId);
+      return { ...state, ...(window ? { firstPaymentWindow: window } : {}) };
+    });
   }
   async reviewState(authorization: string | undefined, paymentId: string) {
     this.gate();
@@ -287,6 +292,8 @@ export class LinkedCheckoutPayments {
           .first()
       )
         throw new HttpError(409, "Receipt already pending review");
+      const submittedAt = Date.now();
+      if (phase === "FIRST") await assertFirstSubmission(orderId, submittedAt);
       this.media.putInBatch(b, storageKey, bytes, {
         httpMetadata: { contentType: mime },
       });
@@ -304,7 +311,7 @@ export class LinkedCheckoutPayments {
         mime,
         bytes.length,
         proofSha256,
-        Date.now(),
+        submittedAt,
       ];
       const columns =
         "id,orderId,source,submittedBy,attachedBy,submitKey,submitFingerprint,declaredAmount,expectedAmount,proofStorageKey,proofMimeType,proofSize,proofSha256,submittedAt";
