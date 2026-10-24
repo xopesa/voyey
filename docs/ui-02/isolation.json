@@ -1,0 +1,62 @@
+{
+  "base": "bf89540d021c47702868b7003c889f5b00e4dfaa",
+  "baseFiles": 711,
+  "comparedSHA256": 711,
+  "unchanged": 704,
+  "changed": [
+    "apps/miniapp/package.json",
+    "apps/miniapp/src/voyey/App.tsx",
+    "apps/miniapp/src/voyey/components.tsx",
+    "apps/miniapp/src/voyey/domain.ts",
+    "apps/miniapp/src/voyey/messages.ts",
+    "apps/miniapp/src/voyey/styles.css",
+    "pnpm-lock.yaml"
+  ],
+  "missing": [],
+  "unexpected": [],
+  "unchangedD1Migrations": 28,
+  "unchangedOriginalAssets": 7,
+  "productionDemoAbsent": true,
+  "production": [
+    {
+      "path": "apps/miniapp/dist/assets/index-Bh13fmZe.js",
+      "sha256": "b943acec9252f0a06ed8ad36ce6bcfe0f768f8508ab31bd24ac07552544c8f39"
+    },
+    {
+      "path": "apps/miniapp/dist/assets/index-Cgn5PNrw.css",
+      "sha256": "3c9e0702b75a6541a8cb1b1777e6d10663b000b8dd46c8777ab8fa2c4c2e268b"
+    },
+    {
+      "path": "apps/miniapp/dist/index.html",
+      "sha256": "3af3efdf5704e947baf9e9f683122c5883016262bd88c2718aafafe1c8399a12"
+    },
+    {
+      "path": "apps/worker/public/admin/assets/index-CPf77HxM.css",
+      "sha256": "cd16fca636146181b740d86352aeb5dc23f5b7c2017d3c0d9a8ec66b9f992891"
+    },
+    {
+      "path": "apps/worker/public/admin/assets/index-DCatBEP0.js",
+      "sha256": "81c978b98085715a4d07b88d377c82ef5e4787804d735116822c5b6194134f8f"
+    },
+    {
+      "path": "apps/worker/public/admin/index.html",
+      "sha256": "067da7185a0e9841ec14430487b6c420ab20e9c893907668ceb3b8a622ae5ca4"
+    },
+    {
+      "path": "apps/worker/public/assets/index-Bh13fmZe.js",
+      "sha256": "b943acec9252f0a06ed8ad36ce6bcfe0f768f8508ab31bd24ac07552544c8f39"
+    },
+    {
+      "path": "apps/worker/public/assets/index-CeXyqpfA.js",
+      "sha256": "fcc503d1687925f422c513ae5ce85898f1099b92e0f07e2b2d1e1a46c84b4f92"
+    },
+    {
+      "path": "apps/worker/public/assets/index-Cgn5PNrw.css",
+      "sha256": "3c9e0702b75a6541a8cb1b1777e6d10663b000b8dd46c8777ab8fa2c4c2e268b"
+    },
+    {
+      "path": "apps/worker/public/index.html",
+      "sha256": "3af3efdf5704e947baf9e9f683122c5883016262bd88c2718aafafe1c8399a12"
+    }
+  ]
+}

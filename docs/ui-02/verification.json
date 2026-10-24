@@ -1,0 +1,69 @@
+{
+  "stage": "UI-02",
+  "baseline": "bf89540d021c47702868b7003c889f5b00e4dfaa",
+  "browser": {
+    "actualCapturedResults": "nav-geometry-ru.json",
+    "navTransitions": 35,
+    "viewportGroups": 7,
+    "locale": "ru",
+    "instancePreserved": true,
+    "geometryStable": true,
+    "horizontalOverflow": 0,
+    "navHeightCssPx": 78,
+    "status": "Partially completed; local browser control subsequently disabled in Work settings. Owner authorized completion without further browser actions.",
+    "notCompletedInBrowser": [
+      "printer animation and consecutive frames",
+      "actual PNG encoding/download/visual inspection",
+      "native Web Share and download fallback",
+      "system or UI reduced-motion interaction",
+      "receipt/order RU/UZ responsive layouts",
+      "full Home to Receipt checkout journey",
+      "product buy-bar portal geometry",
+      "keyboard and physical Telegram WebView",
+      "pending/rejected/approved and PREORDER receipt flows"
+    ]
+  },
+  "automated": {
+    "receiptAndExportTests": 20,
+    "ui01TestsPreserved": 11,
+    "receiptComponentSSR": true,
+    "ruUzSSR": true,
+    "reducedMotionSSR": true,
+    "canvasAndShare": "Mocked browser APIs; not proof of actual browser PNG/download/native sharing",
+    "livePaymentsOrServices": false,
+    "fullSuite": {
+      "passed": 1487,
+      "skipped": 5,
+      "failed": 0,
+      "config": 10,
+      "api": 249,
+      "worker": 862,
+      "miniapp": 200,
+      "admin": 150,
+      "bot": 16,
+      "turboCache": "disabled with --force; 0 cached; 7 tasks successful"
+    },
+    "rootBuild": "passed, local guarded dry-run only",
+    "rootTypecheck": "passed",
+    "rootLint": "passed",
+    "configPreflight": "passed",
+    "installFrozen": "passed",
+    "prismaValidate": "passed",
+    "gitleaks": "no leaks",
+    "gitFsck": "passed",
+    "prettier": "passed",
+    "gitDiffCheck": "passed"
+  },
+  "production": {
+    "demoAndMotionExcluded": true,
+    "commerceFlagUnchangedAndOff": true,
+    "backendUnchanged": true,
+    "migrationsUnchanged": 28,
+    "originalImageFilesUnchanged": 7
+  },
+  "git": {
+    "remoteWrites": false,
+    "deployment": false,
+    "realMigrations": false
+  }
+}

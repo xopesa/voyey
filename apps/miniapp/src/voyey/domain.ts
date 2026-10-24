@@ -22,7 +22,9 @@ export type ErrorCode =
   | "expired"
   | "pending"
   | "attempts"
-  | "paid";
+  | "paid"
+  | "receipt"
+  | "settlement";
 export class DemoError extends Error {
   constructor(public readonly code: ErrorCode) {
     super(code);
@@ -78,13 +80,23 @@ export type DemoOrder = {
   remaining: number;
   cargo: 0 | null;
   promoCode: string | null;
+  payments?: DemoConfirmedPayment[];
+  settlement?: { cargo: number; arrivedAt: number; completedAt: number | null };
   claims: Array<{
     key: string;
     submittedAt: number;
     status: "SUBMITTED" | "APPROVED" | "REJECTED";
     name: string;
     decisionAt: number | null;
+    amount: number;
   }>;
+};
+export type DemoConfirmedPayment = {
+  id: string;
+  phase: "FIRST" | "FINAL";
+  amount: number;
+  submittedAt: number;
+  confirmedAt: number;
 };
 export type DemoState = {
   cart: DemoCartRow[];
@@ -414,6 +426,7 @@ export function submitReceipt(
         status: "SUBMITTED",
         name: file.name,
         decisionAt: null,
+        amount: order.firstAmount,
       },
     ],
   };
@@ -425,8 +438,26 @@ export function reviewReceipt(
 ): DemoOrder {
   const pending = order.claims.find((c) => c.status === "SUBMITTED");
   if (!pending) return order;
+  if (
+    decision === "APPROVED" &&
+    (!Number.isSafeInteger(pending.amount) || pending.amount <= 0)
+  )
+    throw new DemoError("receipt");
   return {
     ...order,
+    payments:
+      decision === "APPROVED"
+        ? [
+            ...(order.payments ?? []),
+            {
+              id: pending.key,
+              phase: "FIRST",
+              amount: pending.amount,
+              submittedAt: pending.submittedAt,
+              confirmedAt: now,
+            },
+          ]
+        : order.payments,
     extensionAt:
       decision === "REJECTED" &&
       order.extensionAt === null &&

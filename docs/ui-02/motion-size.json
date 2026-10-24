@@ -1,0 +1,8 @@
+{
+  "installedVersion": "14.6.0",
+  "reactVersion": "19.3.0",
+  "measured": "isolated minified ESM export of used Motion APIs; React external; not production app bundle",
+  "minifiedBytes": 142425,
+  "gzipBytes": 48464,
+  "additionalExportDependency": false
+}

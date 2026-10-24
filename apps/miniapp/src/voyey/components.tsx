@@ -1,10 +1,12 @@
+import { useEffect, useRef, useState, useId, type ReactNode } from "react";
 import {
-  useEffect,
-  useRef,
-  useState,
-  type ButtonHTMLAttributes,
-  type ReactNode,
-} from "react";
+  AnimatePresence,
+  LayoutGroup,
+  motion,
+  useIsPresent,
+  type HTMLMotionProps,
+} from "motion/react";
+import { motionTokens, useVoyeyMotion, useVoyeyTransition } from "./motion";
 import type { SaleMode } from "@stenzo/shared";
 import { assets } from "./assets";
 import { modes, type DemoState } from "./domain";
@@ -34,8 +36,14 @@ export type IconName =
   | "card"
   | "check"
   | "clock"
-  | "bag";
+  | "bag"
+  | "receipt"
+  | "download"
+  | "share";
 const paths: Record<IconName, string> = {
+  receipt: "M5 3h14v18l-3-2-4 2-4-2-3 2ZM8 7h8M8 11h8M8 15h5",
+  download: "M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5",
+  share: "M12 15V3m-5 5 5-5 5 5M5 12v9h14v-9",
   home: "m3 10 9-7 9 7v10H15v-7H9v7H3Z",
   search: "M20 20l-5-5m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0",
   heart:
@@ -85,20 +93,37 @@ export function VoyeyButton({
   secondary = false,
   loading = false,
   ...props
-}: ButtonHTMLAttributes<HTMLButtonElement> & {
+}: Omit<HTMLMotionProps<"button">, "children"> & {
+  children?: ReactNode;
   secondary?: boolean;
   loading?: boolean;
 }) {
+  const { reduced } = useVoyeyMotion(),
+    transition = useVoyeyTransition(motionTokens.tap);
   return (
-    <button
+    <motion.button
+      whileTap={reduced ? undefined : { scale: 0.98 }}
+      transition={transition}
       {...props}
       type={props.type ?? "button"}
       disabled={props.disabled || loading}
       aria-busy={loading || undefined}
       className={`vy-button ${secondary ? "vy-secondary" : ""} ${props.className ?? ""}`}
     >
-      {loading ? <span className="vy-spinner" /> : children}
-    </button>
+      {loading ? (
+        <motion.span
+          className="vy-spinner"
+          animate={{ rotate: reduced ? 0 : 360 }}
+          transition={{
+            duration: 0.7,
+            repeat: reduced ? 0 : Infinity,
+            ease: "linear",
+          }}
+        />
+      ) : (
+        children
+      )}
+    </motion.button>
   );
 }
 export function VoyeyIconButton({
@@ -106,13 +131,21 @@ export function VoyeyIconButton({
   label,
   active = false,
   ...props
-}: ButtonHTMLAttributes<HTMLButtonElement> & {
+}: Omit<HTMLMotionProps<"button">, "children"> & {
+  children?: ReactNode;
   icon: IconName;
   label: string;
   active?: boolean;
 }) {
+  const { reduced } = useVoyeyMotion(),
+    transition = useVoyeyTransition(motionTokens.tap);
   return (
-    <button
+    <motion.button
+      whileTap={reduced ? undefined : { scale: 0.96 }}
+      animate={{
+        color: icon === "heart" ? (active ? "#d31532" : "#526078") : undefined,
+      }}
+      transition={transition}
       {...props}
       type="button"
       aria-label={label}
@@ -122,7 +155,7 @@ export function VoyeyIconButton({
     >
       <VoyeyIcon name={icon} />
       {props.children}
-    </button>
+    </motion.button>
   );
 }
 export function VoyeyGlassSurface({
@@ -151,12 +184,18 @@ export function VoyeyPrice({
   large?: boolean;
 }) {
   return (
-    <span className={`vy-price ${large ? "vy-price-large" : ""}`}>
+    <motion.span
+      key={amount}
+      initial={{ opacity: 0.55 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.16 }}
+      className={`vy-price ${large ? "vy-price-large" : ""}`}
+    >
       {new Intl.NumberFormat(locale === "ru" ? "ru-RU" : "uz-UZ").format(
         amount,
       )}{" "}
       <span className="vy-currency">{translator(locale)("unit")}</span>
-    </span>
+    </motion.span>
   );
 }
 export function VoyeySaleModeBadge({
@@ -252,6 +291,7 @@ export function VoyeyQuantityControl({
   max?: number;
   t: Translator;
 }) {
+  const { reduced } = useVoyeyMotion();
   return (
     <div
       className="vy-quantity vy-glass"
@@ -264,7 +304,19 @@ export function VoyeyQuantityControl({
         disabled={value <= 1}
         onClick={() => onChange(value - 1)}
       />
-      <output aria-live="polite">{value}</output>
+      <output aria-live="polite">
+        <AnimatePresence initial={false} mode="popLayout">
+          <motion.span
+            key={value}
+            initial={{ opacity: 0, y: reduced ? 0 : 3 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: reduced ? 0 : -3 }}
+            transition={{ duration: reduced ? 0.08 : motionTokens.tap }}
+          >
+            {value}
+          </motion.span>
+        </AnimatePresence>
+      </output>
       <VoyeyIconButton
         icon="plus"
         label={t("increase")}
@@ -287,22 +339,44 @@ export function VoyeyModeToggle({
   counts?: Record<SaleMode, number>;
   available?: Record<SaleMode, boolean>;
 }) {
+  const id = useId(),
+    { reduced } = useVoyeyMotion();
   return (
-    <div className="vy-segmented" role="group" aria-label={t("saleMode")}>
-      {(["IN_STOCK", "PREORDER"] as const).map((m) => (
-        <button
-          type="button"
-          key={m}
-          disabled={available && !available[m]}
-          aria-pressed={mode === m}
-          className={mode === m ? "is-selected" : ""}
-          onClick={() => onChange(m)}
-        >
-          {t(m === "IN_STOCK" ? "inStock" : "preorder")}
-          {counts ? ` (${counts[m]})` : ""}
-        </button>
-      ))}
-    </div>
+    <LayoutGroup id={id}>
+      <div
+        className="vy-segmented vy-motion-segmented"
+        role="group"
+        aria-label={t("saleMode")}
+      >
+        {(["IN_STOCK", "PREORDER"] as const).map((m) => (
+          <button
+            type="button"
+            key={m}
+            disabled={available && !available[m]}
+            aria-pressed={mode === m}
+            className={mode === m ? "is-selected" : ""}
+            onClick={() => onChange(m)}
+          >
+            {mode === m && (
+              <motion.span
+                aria-hidden="true"
+                className="vy-mode-indicator"
+                layoutId={reduced ? undefined : "mode"}
+                transition={{
+                  type: "spring",
+                  duration: motionTokens.tab,
+                  bounce: 0.03,
+                }}
+              />
+            )}
+            <span className="vy-segment-label">
+              {t(m === "IN_STOCK" ? "inStock" : "preorder")}
+              {counts ? ` (${counts[m]})` : ""}
+            </span>
+          </button>
+        ))}
+      </div>
+    </LayoutGroup>
   );
 }
 export function VoyeyProductCard({
@@ -324,6 +398,7 @@ export function VoyeyProductCard({
   onAdd: () => void;
   preferredMode?: SaleMode;
 }) {
+  const { reduced } = useVoyeyMotion();
   const name = localizedText(locale, {
       ru: product.nameRu,
       uz: product.nameUz,
@@ -332,7 +407,13 @@ export function VoyeyProductCard({
     pre = product.variants.some((v) => modes(v, state.stock).PREORDER),
     fav = state.favorites.includes(product.id);
   return (
-    <article className="vy-product-card">
+    <motion.article
+      className="vy-product-card"
+      initial={{ opacity: 0.3 }}
+      animate={{ opacity: 1 }}
+      whileTap={reduced ? undefined : { scale: 0.99 }}
+      transition={{ duration: reduced ? 0.08 : 0.18 }}
+    >
       <div className="vy-card-image">
         <button
           className="vy-image-link"
@@ -376,7 +457,7 @@ export function VoyeyProductCard({
           {name}
         </button>
       </div>
-    </article>
+    </motion.article>
   );
 }
 export function VoyeyBottomNav({
@@ -390,36 +471,59 @@ export function VoyeyBottomNav({
   count: number;
   t: Translator;
 }) {
+  const { reduced } = useVoyeyMotion(),
+    instanceId = useId();
   return (
-    <nav className="vy-bottom-nav vy-glass" aria-label="VOYEY">
-      {(["home", "catalog", "favorites", "cart", "profile"] as const).map(
-        (key) => (
-          <button
-            type="button"
-            key={key}
-            aria-current={active === key ? "page" : undefined}
-            onClick={() => onChange(key)}
-            className={active === key ? "is-active" : ""}
-          >
-            <span className="vy-nav-icon">
-              <VoyeyIcon
-                name={
-                  key === "catalog"
-                    ? "search"
-                    : key === "favorites"
-                      ? "heart"
-                      : key
-                }
-              />
-              {key === "cart" && count > 0 && (
-                <span className="vy-count">{count}</span>
+    <LayoutGroup id="voyey-navigation">
+      <nav
+        className="vy-bottom-nav vy-glass"
+        aria-label="VOYEY"
+        data-nav-instance={instanceId}
+      >
+        {(["home", "catalog", "favorites", "cart", "profile"] as const).map(
+          (key) => (
+            <motion.button
+              whileTap={reduced ? undefined : { scale: 0.98 }}
+              animate={{ color: active === key ? "#d31532" : "#657085" }}
+              transition={{ duration: reduced ? 0.08 : motionTokens.tab }}
+              type="button"
+              key={key}
+              aria-current={active === key ? "page" : undefined}
+              onClick={() => onChange(key)}
+              className={active === key ? "is-active" : ""}
+            >
+              {active === key && (
+                <motion.span
+                  className="vy-nav-indicator"
+                  aria-hidden="true"
+                  layoutId={reduced ? undefined : "active"}
+                  transition={{
+                    type: "spring",
+                    duration: motionTokens.tab,
+                    bounce: 0.03,
+                  }}
+                />
               )}
-            </span>
-            <span>{t(key)}</span>
-          </button>
-        ),
-      )}
-    </nav>
+              <span className="vy-nav-icon">
+                <VoyeyIcon
+                  name={
+                    key === "catalog"
+                      ? "search"
+                      : key === "favorites"
+                        ? "heart"
+                        : key
+                  }
+                />
+                {key === "cart" && count > 0 && (
+                  <span className="vy-count">{count}</span>
+                )}
+              </span>
+              <span>{t(key)}</span>
+            </motion.button>
+          ),
+        )}
+      </nav>
+    </LayoutGroup>
   );
 }
 export function VoyeyProductGallery({
@@ -445,7 +549,23 @@ export function VoyeyProductGallery({
   return (
     <section className="vy-gallery" aria-label={t("gallery")}>
       <div className={`vy-main-photo vy-photo-${photo}`}>
-        <img src={assets[product.image]} alt={name} width="800" height="800" />
+        <AnimatePresence initial={false}>
+          <motion.img
+            key={photo}
+            src={assets[product.image]}
+            alt={name}
+            width="800"
+            height="800"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            style={{
+              scale: photo === 0 ? 1 : photo === 1 ? 1.4 : 1.8,
+              transformOrigin: photo === 1 ? "60% 40%" : "40% 70%",
+            }}
+          />
+        </AnimatePresence>
         <div className="vy-gallery-actions">
           <VoyeyIconButton icon="back" label={t("back")} onClick={onBack} />
           <VoyeyIconButton
@@ -664,20 +784,36 @@ export function VoyeyDialog({
   t: Translator;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
+  const { reduced } = useVoyeyMotion(),
+    present = useIsPresent();
   useEffect(() => {
+    const previous = document.activeElement;
     ref.current?.showModal();
+    const dialog = ref.current;
+    return () => {
+      dialog?.close();
+      if (previous instanceof HTMLElement && previous.isConnected)
+        previous.focus({ preventScroll: true });
+    };
   }, []);
   return (
-    <dialog
+    <motion.dialog
+      initial={{ opacity: 0, y: reduced ? 0 : 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: reduced ? 0 : 8 }}
+      transition={{
+        duration: reduced ? 0.08 : motionTokens.dialog,
+        ease: motionTokens.ease,
+      }}
       ref={ref}
       className="vy-dialog"
       aria-label={title}
       onCancel={(e) => {
         e.preventDefault();
-        onClose();
+        if (present) onClose();
       }}
       onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
+        if (present && e.target === e.currentTarget) onClose();
       }}
     >
       <div className="vy-dialog-head">
@@ -685,6 +821,6 @@ export function VoyeyDialog({
         <VoyeyIconButton icon="close" label={t("close")} onClick={onClose} />
       </div>
       {children}
-    </dialog>
+    </motion.dialog>
   );
 }

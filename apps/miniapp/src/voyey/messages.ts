@@ -1,7 +1,9 @@
 import { localizedText, type Locale } from "../lib/i18n";
+import { ui02ru, ui02uz } from "./ui02-messages";
 export { localizedText };
 export type { Locale };
 const ru = {
+  ...ui02ru,
   brand: "VOYEY",
   demo: "Демо · без реальных покупок",
   home: "Главная",
@@ -198,6 +200,7 @@ const ru = {
 };
 export type UiKey = keyof typeof ru;
 const uz: Record<UiKey, string> = {
+  ...ui02uz,
   brand: "VOYEY",
   demo: "Namoyish · haqiqiy xaridsiz",
   home: "Bosh sahifa",

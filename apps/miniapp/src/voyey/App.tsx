@@ -1,4 +1,28 @@
-import { useEffect, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import { AnimatePresence, motion } from "motion/react";
+import {
+  VoyeyMotionSystem,
+  VoyeyPage,
+  VoyeyPurchasePortal,
+  useVoyeyMotion,
+  motionTokens,
+} from "./motion";
+import { useDemoKeyboard } from "./viewport";
+import {
+  receiptFor,
+  recordDemoArrival,
+  confirmDemoFinal,
+  receiptDate,
+  type ReceiptKind,
+} from "./receipt";
+import { VoyeyReceiptScreen, VoyeyOrderDetails } from "./ReceiptScreen";
+import { saveReceipt } from "./receipt-export";
 import { createRoot } from "react-dom/client";
 import type { SaleMode } from "@stenzo/shared";
 import { useRouter, useSearchParams } from "../spa/navigation";
@@ -75,22 +99,57 @@ function App() {
       }
     }),
     [filters, setFilters] = useState<CatalogFilters>({ ...defaultFilters }),
-    [modal, setModal] = useState<
-      "filters" | "notifications" | "contact" | null
-    >(null),
     [toast, setToast] = useState<UiKey | "">(""),
-    [keyboard, setKeyboard] = useState(false),
     [slide, setSlide] = useState(0),
-    [clockOffset, setClockOffset] = useState(0);
+    [clockOffset, setClockOffset] = useState(0),
+    [exporting, setExporting] = useState(false);
+  const exportLock = useRef(false),
+    keyboard = useDemoKeyboard(),
+    motionSettings = useVoyeyMotion(),
+    panel = params.get("panel"),
+    modal =
+      panel === "filters" || panel === "notifications" || panel === "contact"
+        ? panel
+        : null;
   const t = translator(locale),
     mode: SaleMode =
       params.get("mode") === "PREORDER" ? "PREORDER" : "IN_STOCK";
   const go = (s: string, extra: Record<string, string> = {}) => {
-    router.push(
-      `/voyey-demo.html?${new URLSearchParams({ screen: s, ...extra })}`,
-    );
-    window.scrollTo(0, 0);
+    const target = `/voyey-demo.html?${new URLSearchParams({ screen: s, ...extra })}`;
+    if (location.pathname + location.search === target) return;
+    const depth = Number(history.state?.voyeyDemo ?? 0);
+    router.push(target);
+    history.replaceState({ voyeyDemo: depth + 1 }, "");
   };
+  const setModal = (value: "filters" | "notifications" | "contact" | null) => {
+    const query = new URLSearchParams(params);
+    if (value) {
+      query.set("panel", value);
+      const depth = Number(history.state?.voyeyDemo ?? 0);
+      router.push(`/voyey-demo.html?${query}`);
+      history.replaceState({ voyeyDemo: depth + 1, vyPanel: value }, "");
+    } else if (history.state?.vyPanel === modal) router.back();
+    else {
+      query.delete("panel");
+      router.replace(`/voyey-demo.html?${query}`);
+    }
+  };
+  const back = () => {
+    if (modal) setModal(null);
+    else if (Number(history.state?.voyeyDemo ?? 0) > 0) router.back();
+    else go("home");
+  };
+  const routeKey = [
+    screen,
+    params.get("product"),
+    params.get("order"),
+    mode,
+    params.get("document"),
+  ].join(":");
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+    document.getElementById("vy-main")?.focus({ preventScroll: true });
+  }, [routeKey]);
   useEffect(() => {
     document.documentElement.lang = locale;
     try {
@@ -99,13 +158,6 @@ function App() {
       /* Storage can be unavailable in embedded browsers. */
     }
   }, [locale]);
-  useEffect(() => {
-    const viewport = window.visualViewport;
-    const update = () =>
-      setKeyboard(!!viewport && window.innerHeight - viewport.height > 140);
-    viewport?.addEventListener("resize", update);
-    return () => viewport?.removeEventListener("resize", update);
-  }, []);
   useEffect(() => {
     if (!toast) return;
     const id = setTimeout(() => setToast(""), 4500);
@@ -229,6 +281,32 @@ function App() {
   );
   const selectedProduct = products.find((p) => p.id === params.get("product"));
   const order = state.orders.find((o) => o.id === params.get("order"));
+  const receiptKind: ReceiptKind =
+      params.get("document") === "SETTLEMENT" ? "SETTLEMENT" : "FIRST",
+    receipt = order ? receiptFor(order, receiptKind) : null;
+  const updateOrder = (updated: DemoOrder) =>
+    setState((s) => ({
+      ...s,
+      orders: s.orders.map((o) => (o.id === updated.id ? updated : o)),
+    }));
+  const exportReceipt = async (share: boolean) => {
+    if (exportLock.current) return;
+    if (!receipt) {
+      setToast("error.receipt");
+      return;
+    }
+    exportLock.current = true;
+    setExporting(true);
+    try {
+      const result = await saveReceipt(receipt, locale, t, share);
+      if (result !== "cancelled") setToast(result);
+    } catch {
+      setToast("receiptExportError");
+    } finally {
+      exportLock.current = false;
+      setExporting(false);
+    }
+  };
   let content: ReactNode;
   if (screen === "home")
     content = (
@@ -394,7 +472,7 @@ function App() {
         state={state}
         locale={locale}
         t={t}
-        onBack={() => go("catalog")}
+        onBack={back}
         onFavorite={() => favorite(selectedProduct.id)}
         onAdd={(v, m, q, h, w) => {
           try {
@@ -439,51 +517,71 @@ function App() {
         ) : (
           <>
             <div className="vy-cart-rows">
-              {s.rows.map((r) => {
-                const { p, v } = item(r);
-                return (
-                  <article className="vy-cart-row" key={r.id}>
-                    <button
-                      className="vy-row-image"
-                      onClick={() => go("product", { product: p.id })}
+              <AnimatePresence initial={false} mode="popLayout">
+                {s.rows.map((r) => {
+                  const { p, v } = item(r);
+                  return (
+                    <motion.article
+                      layout="position"
+                      className="vy-cart-row"
+                      key={r.id}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0, x: motionSettings.reduced ? 0 : -8 }}
+                      transition={{
+                        duration: motionSettings.reduced
+                          ? 0.08
+                          : motionTokens.tab,
+                      }}
                     >
-                      <img src={assets[p.image]} alt={title(p, locale)} />
-                    </button>
-                    <div className="vy-row-info">
                       <button
-                        className="vy-product-name"
+                        className="vy-row-image"
                         onClick={() => go("product", { product: p.id })}
                       >
-                        {title(p, locale)}
+                        <img src={assets[p.image]} alt={title(p, locale)} />
                       </button>
-                      <p className="vy-caption">
-                        {localizedText(locale, { ru: v.nameRu, uz: v.nameUz })}
-                      </p>
-                      <VoyeyPrice amount={p.price} locale={locale} />
-                      <VoyeyQuantityControl
-                        value={r.quantity}
-                        max={Math.min(
-                          99 -
-                            state.cart
-                              .filter(
-                                (x) =>
-                                  x.variantId === r.variantId && x.id !== r.id,
-                              )
-                              .reduce((n, x) => n + x.quantity, 0),
-                          mode === "IN_STOCK" ? (state.stock[v.id] ?? 0) : 99,
-                        )}
-                        onChange={(n) => run(() => changeQuantity(state, r, n))}
-                        t={t}
+                      <div className="vy-row-info">
+                        <button
+                          className="vy-product-name"
+                          onClick={() => go("product", { product: p.id })}
+                        >
+                          {title(p, locale)}
+                        </button>
+                        <p className="vy-caption">
+                          {localizedText(locale, {
+                            ru: v.nameRu,
+                            uz: v.nameUz,
+                          })}
+                        </p>
+                        <VoyeyPrice amount={p.price} locale={locale} />
+                        <VoyeyQuantityControl
+                          value={r.quantity}
+                          max={Math.min(
+                            99 -
+                              state.cart
+                                .filter(
+                                  (x) =>
+                                    x.variantId === r.variantId &&
+                                    x.id !== r.id,
+                                )
+                                .reduce((n, x) => n + x.quantity, 0),
+                            mode === "IN_STOCK" ? (state.stock[v.id] ?? 0) : 99,
+                          )}
+                          onChange={(n) =>
+                            run(() => changeQuantity(state, r, n))
+                          }
+                          t={t}
+                        />
+                      </div>
+                      <VoyeyIconButton
+                        icon="trash"
+                        label={`${t("remove")}: ${title(p, locale)}`}
+                        onClick={() => setState(removeRow(state, r.id))}
                       />
-                    </div>
-                    <VoyeyIconButton
-                      icon="trash"
-                      label={`${t("remove")}: ${title(p, locale)}`}
-                      onClick={() => setState(removeRow(state, r.id))}
-                    />
-                  </article>
-                );
-              })}
+                    </motion.article>
+                  );
+                })}
+              </AnimatePresence>
             </div>
             <VoyeyGlassSurface className="vy-cart-summary">
               <VoyeyPromoInput
@@ -574,6 +672,48 @@ function App() {
           }))
         }
         onError={fail}
+        onReceipt={() => go("receipt", { order: order.id })}
+        onDetails={() => go("order", { order: order.id })}
+      />
+    );
+  else if (screen === "receipt")
+    content = (
+      <VoyeyReceiptScreen
+        key={`${order?.id}:${receiptKind}`}
+        data={receipt}
+        locale={locale}
+        t={t}
+        exporting={exporting}
+        onExport={(share) => {
+          void exportReceipt(share);
+        }}
+      />
+    );
+  else if (screen === "order" && order)
+    content = (
+      <VoyeyOrderDetails
+        key={order.id}
+        order={order}
+        locale={locale}
+        t={t}
+        onPayment={() => go("payment", { order: order.id })}
+        onReceipt={(kind) => go("receipt", { order: order.id, document: kind })}
+        onArrival={(cargo) => {
+          try {
+            updateOrder(
+              recordDemoArrival(order, cargo, Date.now() + clockOffset),
+            );
+          } catch (e) {
+            fail(e);
+          }
+        }}
+        onFinal={() => {
+          try {
+            updateOrder(confirmDemoFinal(order, Date.now() + clockOffset));
+          } catch (e) {
+            fail(e);
+          }
+        }}
       />
     );
   else if (screen === "profile")
@@ -598,6 +738,19 @@ function App() {
           </div>
         </section>
         <section className="vy-panel">
+          <label className="vy-reduced-setting">
+            <input
+              type="checkbox"
+              checked={motionSettings.forceReduced}
+              onChange={(e) => motionSettings.setForceReduced(e.target.checked)}
+            />
+            <span>
+              {t("motionReduced")}
+              <small>{t("motionHint")}</small>
+            </span>
+          </label>
+        </section>
+        <section className="vy-panel">
           <h2>{t("orders")}</h2>
           {!state.orders.length ? (
             <p className="vy-caption">{t("noOrders")}</p>
@@ -606,7 +759,7 @@ function App() {
               <button
                 key={o.id}
                 className="vy-order-link"
-                onClick={() => go("payment", { order: o.id })}
+                onClick={() => go("order", { order: o.id })}
               >
                 <span>
                   {t("demoOrder", { id: o.id })}
@@ -644,17 +797,21 @@ function App() {
       />
     );
   const pageTitle = t(
-    screen === "checkout"
-      ? "checkoutTitle"
-      : screen === "payment"
-        ? "paymentTitle"
-        : screen === "catalog"
-          ? "catalog"
-          : screen === "cart"
-            ? "cart"
-            : screen === "favorites"
-              ? "favorites"
-              : "profile",
+    screen === "receipt"
+      ? "receiptTitle"
+      : screen === "order"
+        ? "orderDetails"
+        : screen === "checkout"
+          ? "checkoutTitle"
+          : screen === "payment"
+            ? "paymentTitle"
+            : screen === "catalog"
+              ? "catalog"
+              : screen === "cart"
+                ? "cart"
+                : screen === "favorites"
+                  ? "favorites"
+                  : "profile",
   );
   return (
     <div className="voyey-demo" data-keyboard={keyboard} data-screen={screen}>
@@ -667,25 +824,27 @@ function App() {
               <VoyeyLogo />
             ) : (
               <>
-                <VoyeyIconButton
-                  icon="back"
-                  label={t("back")}
-                  onClick={() =>
-                    go(
-                      screen === "checkout" ? "cart" : "home",
-                      screen === "checkout" ? { mode } : {},
-                    )
-                  }
-                />
+                <VoyeyIconButton icon="back" label={t("back")} onClick={back} />
                 <h1>{pageTitle}</h1>
               </>
             )}
             <div className="vy-header-actions">
-              <VoyeyIconButton
-                icon="search"
-                label={t("search")}
-                onClick={() => go("catalog")}
-              />
+              {screen === "receipt" ? (
+                <VoyeyIconButton
+                  icon="share"
+                  label={t("receiptShare")}
+                  disabled={!receipt || exporting}
+                  onClick={() => {
+                    void exportReceipt(true);
+                  }}
+                />
+              ) : (
+                <VoyeyIconButton
+                  icon="search"
+                  label={t("search")}
+                  onClick={() => go("catalog")}
+                />
+              )}
               {screen === "home" && (
                 <>
                   <VoyeyIconButton
@@ -708,13 +867,19 @@ function App() {
           </header>
         )}
         <p className="vy-demo-label">{t("demo")}</p>
-        <main id="vy-main">{content}</main>
+        <main id="vy-main" tabIndex={-1}>
+          <AnimatePresence initial={false} mode="popLayout">
+            <VoyeyPage key={routeKey} route={routeKey}>
+              {content}
+            </VoyeyPage>
+          </AnimatePresence>
+        </main>
       </div>
       <VoyeyBottomNav
         active={
           screen === "product"
             ? "catalog"
-            : ["checkout", "payment"].includes(screen)
+            : ["checkout", "payment", "order", "receipt"].includes(screen)
               ? "cart"
               : screen
         }
@@ -722,42 +887,48 @@ function App() {
         count={counts.IN_STOCK + counts.PREORDER}
         t={t}
       />
+      <div id="vy-purchase-slot" />
       {toast && (
         <div className="vy-toast" role="status">
           {t(toast)}
         </div>
       )}
-      {modal && (
-        <VoyeyDialog
-          title={t(
-            modal === "filters"
-              ? "filters"
-              : modal === "notifications"
-                ? "notificationsTitle"
-                : "contact",
-          )}
-          onClose={() => setModal(null)}
-          t={t}
-        >
-          {modal === "filters" ? (
-            <FilterForm
-              filters={filters}
-              onApply={(f) => {
-                setFilters(f);
-                setModal(null);
-              }}
-              locale={locale}
-              t={t}
-            />
-          ) : (
-            <p>
-              {t(
-                modal === "notifications" ? "notificationsText" : "contactText",
-              )}
-            </p>
-          )}
-        </VoyeyDialog>
-      )}
+      <AnimatePresence>
+        {modal && (
+          <VoyeyDialog
+            key={modal}
+            title={t(
+              modal === "filters"
+                ? "filters"
+                : modal === "notifications"
+                  ? "notificationsTitle"
+                  : "contact",
+            )}
+            onClose={() => setModal(null)}
+            t={t}
+          >
+            {modal === "filters" ? (
+              <FilterForm
+                filters={filters}
+                onApply={(f) => {
+                  setFilters(f);
+                  setModal(null);
+                }}
+                locale={locale}
+                t={t}
+              />
+            ) : (
+              <p>
+                {t(
+                  modal === "notifications"
+                    ? "notificationsText"
+                    : "contactText",
+                )}
+              </p>
+            )}
+          </VoyeyDialog>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -1018,29 +1189,31 @@ function Product({
         </details>
         <p className="vy-caption">{t("photoSource")}</p>
       </div>
-      <div className="vy-buy-bar vy-glass">
-        <VoyeyQuantityControl
-          value={Math.min(q, max)}
-          max={max}
-          onChange={setQ}
-          t={t}
-        />
-        <VoyeyButton
-          disabled={!available[actualMode]}
-          onClick={() =>
-            onAdd(
-              v,
-              actualMode,
-              Math.min(q, max),
-              height ? Number(height) : null,
-              weight ? Number(weight) : null,
-            )
-          }
-        >
-          <VoyeyIcon name="cart" size={20} />
-          {t("add")}
-        </VoyeyButton>
-      </div>
+      <VoyeyPurchasePortal>
+        <div className="vy-buy-bar vy-glass">
+          <VoyeyQuantityControl
+            value={Math.min(q, max)}
+            max={max}
+            onChange={setQ}
+            t={t}
+          />
+          <VoyeyButton
+            disabled={!available[actualMode]}
+            onClick={() =>
+              onAdd(
+                v,
+                actualMode,
+                Math.min(q, max),
+                height ? Number(height) : null,
+                weight ? Number(weight) : null,
+              )
+            }
+          >
+            <VoyeyIcon name="cart" size={20} />
+            {t("add")}
+          </VoyeyButton>
+        </div>
+      </VoyeyPurchasePortal>
     </div>
   );
 }
@@ -1215,6 +1388,8 @@ function Payment({
   onOffset,
   onChange,
   onError,
+  onReceipt,
+  onDetails,
 }: {
   order: DemoOrder;
   locale: Locale;
@@ -1223,6 +1398,8 @@ function Payment({
   onOffset: (n: number) => void;
   onChange: (o: DemoOrder) => void;
   onError: (e: unknown) => void;
+  onReceipt: () => void;
+  onDetails: () => void;
 }) {
   const [now, setNow] = useState(Date.now()),
     [file, setFile] = useState<{
@@ -1311,7 +1488,18 @@ function Payment({
           role="status"
         >
           <VoyeyIcon name={paid ? "check" : "clock"} />
-          <h3>{t(paid ? "approved" : "pending")}</h3>
+          <h3>{t(paid ? "approved" : "receiptPending")}</h3>
+          {pending && (
+            <p>
+              {t("receiptSubmitted", {
+                date: receiptDate(
+                  o.claims.find((c) => c.status === "SUBMITTED")!.submittedAt,
+                  locale,
+                ),
+                n: o.claims.length,
+              })}
+            </p>
+          )}
           <p>{t(paid ? "approvedHint" : "pendingHint")}</p>
         </div>
       ) : (
@@ -1326,6 +1514,15 @@ function Payment({
         </>
       )}
       <p>{t("attempts", { n: o.claims.length })}</p>
+      {paid && receiptFor(o) && (
+        <VoyeyButton className="vy-full" onClick={onReceipt}>
+          <VoyeyIcon name="receipt" />
+          {t("receiptOpen")}
+        </VoyeyButton>
+      )}
+      <VoyeyButton secondary className="vy-full" onClick={onDetails}>
+        {t("orderDetails")}
+      </VoyeyButton>
       <div className="vy-form">
         <label className={`vy-file ${blocked ? "is-disabled" : ""}`}>
           {t("chooseReceipt")}
@@ -1380,12 +1577,12 @@ function Payment({
           {t("submitReceipt")}
         </VoyeyButton>
       </div>
-      {o.remaining > 0 && (
+      {o.remaining > 0 && o.settlement?.completedAt == null && (
         <p>
           {t("remainder")}: <VoyeyPrice amount={o.remaining} locale={locale} />
         </p>
       )}
-      {o.saleMode === "PREORDER" && (
+      {o.saleMode === "PREORDER" && !o.settlement && (
         <p className="vy-caption">{t("cargoHint")}</p>
       )}
       <details className="vy-simulator">
@@ -1422,5 +1619,10 @@ function Payment({
 }
 export function mountDemo() {
   const root = document.getElementById("root");
-  if (root) createRoot(root).render(<App />);
+  if (root)
+    createRoot(root).render(
+      <VoyeyMotionSystem>
+        <App />
+      </VoyeyMotionSystem>,
+    );
 }

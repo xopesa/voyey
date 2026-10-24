@@ -17,6 +17,10 @@
 body {
   margin: 0;
 }
+html {
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+}
 button,
 input,
 select {
@@ -129,6 +133,10 @@ summary::-webkit-details-marker {
   --vy-glow: 0 3px 14px #d3153225;
   --vy-blur: 16px;
   --vy-control: 48px;
+  --vy-nav-height: 78px;
+  --vy-nav-bottom: 10px;
+  --vy-dock-gap: 10px;
+  --vy-buy-height: 64px;
   --vy-safe-bottom: max(
     env(safe-area-inset-bottom, 0px),
     var(--tg-safe-area-inset-bottom, 0px),
@@ -227,14 +235,7 @@ summary::-webkit-details-marker {
   font-weight: 600;
   font-size: var(--vy-font-body);
   box-shadow: var(--vy-glow);
-  transition:
-    transform 0.15s,
-    box-shadow 0.15s;
   line-height: 1.4;
-}
-.vy-button:active:not(:disabled),
-.vy-icon-button:active:not(:disabled) {
-  transform: scale(0.97);
 }
 .vy-secondary {
   background: #fff;
@@ -496,7 +497,6 @@ summary::-webkit-details-marker {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.25s;
 }
 .vy-card-heart {
   position: absolute;
@@ -629,17 +629,20 @@ summary::-webkit-details-marker {
   z-index: 20;
   left: 50%;
   transform: translateX(-50%);
-  bottom: calc(10px + var(--vy-safe-bottom));
+  bottom: calc(var(--vy-nav-bottom) + var(--vy-safe-bottom));
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   width: calc(100% - 24px);
   max-width: 520px;
   padding: 6px;
   border-radius: 30px;
-  min-height: 72px;
+  height: var(--vy-nav-height);
+  min-height: var(--vy-nav-height);
+  max-height: var(--vy-nav-height);
   box-shadow: 0 3px 30px #24305714;
 }
 .vy-bottom-nav button {
+  position: relative;
   border: 1px solid transparent;
   border-radius: 24px;
   background: transparent;
@@ -648,19 +651,47 @@ summary::-webkit-details-marker {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 4px;
   font-size: 11px;
   line-height: 1.2;
-  min-height: 58px;
+  height: 62px;
+  min-height: 0;
+  align-self: center;
   min-width: 0;
-  padding: 5px 2px;
+  padding: 4px 2px;
   overflow-wrap: anywhere;
 }
 .vy-bottom-nav .is-active {
-  background: #fff6f6;
   color: var(--vy-red);
-  border-color: #ffe0e4;
+}
+.vy-nav-indicator,
+.vy-mode-indicator {
+  position: absolute;
+  inset: 0;
+  border: 1px solid #ffe0e4;
+  background: #fff6f6;
+  border-radius: 24px;
   box-shadow: var(--vy-glow);
+  pointer-events: none;
+  z-index: 0;
+}
+.vy-bottom-nav button > span:not(.vy-nav-indicator) {
+  position: relative;
+  z-index: 1;
+}
+.vy-bottom-nav button > span:last-child {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+  min-height: 24px;
+  line-height: 12px;
+}
+.vy-bottom-nav .vy-nav-icon {
+  display: block;
+  width: 21px;
+  height: 21px;
+  min-height: 21px;
 }
 .vy-nav-icon {
   position: relative;
@@ -799,10 +830,11 @@ summary::-webkit-details-marker {
   background: #f7f0e9;
 }
 .vy-main-photo > img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.25s;
 }
 .vy-photo-1 > img {
   transform: scale(1.4);
@@ -961,7 +993,10 @@ summary::-webkit-details-marker {
 .vy-buy-bar {
   position: fixed;
   z-index: 19;
-  bottom: calc(96px + var(--vy-safe-bottom));
+  bottom: calc(
+    var(--vy-nav-bottom) + var(--vy-nav-height) + var(--vy-dock-gap) +
+      var(--vy-safe-bottom)
+  );
   left: 50%;
   transform: translateX(-50%);
   width: calc(100% - 24px);
@@ -970,10 +1005,16 @@ summary::-webkit-details-marker {
   display: flex;
   align-items: center;
   gap: 9px;
+  height: var(--vy-buy-height);
+  min-height: var(--vy-buy-height);
+  max-height: var(--vy-buy-height);
 }
 .vy-buy-bar > .vy-button {
   flex: 1;
-  padding: 12px 10px;
+  padding: 8px 10px;
+  height: 48px;
+  min-height: 48px;
+  min-width: 0;
   font-size: 13px;
 }
 .vy-quantity {
@@ -995,6 +1036,8 @@ summary::-webkit-details-marker {
   background: transparent;
 }
 .vy-quantity output {
+  position: relative;
+  height: 22px;
   width: 24px;
   text-align: center;
   font-size: 14px;
@@ -1338,23 +1381,15 @@ summary::-webkit-details-marker {
   border: 2px solid #ffffff60;
   border-top-color: currentColor;
   border-radius: 50%;
-  animation: vy-spin 0.7s linear infinite;
-}
-@keyframes vy-spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 .voyey-demo[data-keyboard="true"] .vy-bottom-nav,
 .voyey-demo[data-keyboard="true"] .vy-buy-bar {
   visibility: hidden;
+  pointer-events: none;
 }
 @media (hover: hover) {
   .vy-button:hover:not(:disabled) {
     box-shadow: 0 4px 20px #d3153235;
-  }
-  .vy-image-link:hover img {
-    transform: scale(1.03);
   }
   .vy-product-name:hover {
     color: var(--vy-red);
@@ -1541,5 +1576,336 @@ summary::-webkit-details-marker {
     animation: none !important;
     transition: none !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* UI-02: only page contents animate; these fixed layers have no moving ancestor. */
+#vy-main {
+  position: relative;
+  min-height: 180px;
+  outline: none;
+}
+.vy-page {
+  width: 100%;
+  min-width: 0;
+}
+.vy-cart-rows {
+  position: relative;
+}
+.vy-quantity output > span {
+  display: block;
+  width: 100%;
+}
+.vy-motion-segmented button {
+  position: relative;
+  isolation: isolate;
+  min-width: 0;
+}
+.vy-motion-segmented .is-selected {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+.vy-segment-label {
+  position: relative;
+  z-index: 1;
+}
+.vy-product-name {
+  font-size: 13px;
+  line-height: 1.5;
+}
+.vy-cart-summary .vy-total {
+  font-size: 19px;
+}
+.vy-cart-summary > .vy-button {
+  min-height: 50px;
+  margin-top: 4px;
+}
+.vy-checkout {
+  gap: 20px;
+}
+.vy-checkout input {
+  scroll-margin-top: 30px;
+  scroll-margin-bottom: 40px;
+}
+.vy-reduced-setting {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 14px;
+}
+.vy-reduced-setting small {
+  display: block;
+  color: var(--vy-muted);
+  font-size: 12px;
+  line-height: 1.6;
+  margin-top: 6px;
+}
+.vy-order-details {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.vy-order-details .vy-simulator {
+  margin: 0;
+}
+.vy-order-details .vy-simulator label {
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.vy-order-details .vy-checkout-line small {
+  display: block;
+  color: var(--vy-muted);
+  margin-top: 4px;
+}
+.vy-order-details .vy-payment-status {
+  margin: 0;
+}
+.vy-payment > .vy-button {
+  margin: 8px 0;
+}
+.vy-receipt-screen {
+  max-width: 390px;
+  margin: 20px auto 0;
+}
+.vy-printer-stage {
+  position: relative;
+  padding-top: 62px;
+}
+.vy-printer-body {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 72px;
+  border-radius: 24px 24px 16px 16px;
+  border: 1px solid #e2e4eb;
+  background: #f3f3f5;
+  box-shadow: 0 8px 20px #2631440e;
+  z-index: 3;
+}
+.vy-printer-top {
+  height: 49px;
+  background: #fafafb;
+  border-radius: 23px 23px 13px 13px;
+  border-bottom: 1px solid #e8e8ed;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 22px;
+  gap: 5px;
+}
+.vy-printer-top span {
+  display: block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #dbdce2;
+}
+.vy-printer-top span:last-child {
+  background: #b71c3c;
+}
+.vy-printer-slot {
+  height: 5px;
+  position: absolute;
+  left: 15px;
+  right: 15px;
+  bottom: 8px;
+  background: #675b56;
+  border-radius: 5px;
+  box-shadow: 0 2px 3px #4a2c1a12;
+}
+.vy-print-window {
+  position: relative;
+  z-index: 1;
+  width: calc(100% - 24px);
+  margin: 0 auto;
+  overflow: hidden;
+  padding: 0 0 8px;
+}
+.vy-receipt-paper {
+  background: #fff;
+  min-width: 0;
+  border: 1px solid #e7e8ed;
+  border-top: 0;
+  border-radius: 0 0 13px 13px;
+  padding: 32px 20px 25px;
+  box-shadow: 0 5px 12px #30333a0a;
+}
+.vy-receipt-brand {
+  text-align: center;
+}
+.vy-receipt-brand .vy-logo {
+  margin: 0 auto 18px;
+  width: 156px;
+  height: 46.5px;
+}
+.vy-receipt-brand .vy-eyebrow {
+  font-size: 10px;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.vy-receipt-brand h2 {
+  font-size: 20px;
+  line-height: 1.35;
+  letter-spacing: -0.5px;
+  color: var(--vy-brown);
+}
+.vy-receipt-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  max-width: 100%;
+  margin: 16px 0 0;
+  padding: 7px 11px;
+  color: #236e3c;
+  background: #eff8ef;
+  border: 1px solid #dcefdc;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 550;
+  line-height: 1.5;
+}
+.vy-receipt-meta {
+  border-top: 1px dashed #dedfe5;
+  margin: 24px 0 0;
+  padding: 18px 0 0;
+  font-size: 12px;
+}
+.vy-receipt-meta > div,
+.vy-receipt-amounts > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.vy-receipt-meta dt,
+.vy-receipt-amounts dt {
+  color: var(--vy-muted);
+  overflow-wrap: anywhere;
+}
+.vy-receipt-meta dd,
+.vy-receipt-amounts dd {
+  margin: 0;
+  max-width: 160px;
+  text-align: right;
+  overflow-wrap: anywhere;
+  color: var(--vy-brown);
+}
+.vy-receipt-meta dd {
+  max-width: 140px;
+}
+.vy-receipt-items {
+  margin-top: 20px;
+  padding-top: 19px;
+  border-top: 1px dashed #dedfe5;
+}
+.vy-receipt-item {
+  font-size: 13px;
+  margin-bottom: 18px;
+}
+.vy-receipt-item strong {
+  font-weight: 600;
+  color: var(--vy-brown);
+  overflow-wrap: anywhere;
+}
+.vy-receipt-item p {
+  color: var(--vy-muted);
+  font-size: 12px;
+  margin: 4px 0 8px;
+}
+.vy-receipt-item > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  color: var(--vy-muted);
+  font-size: 12px;
+}
+.vy-receipt-paper .vy-price {
+  font-size: 12px;
+  letter-spacing: 0;
+}
+.vy-receipt-amounts {
+  margin: 20px 0 0;
+  padding-top: 19px;
+  border-top: 1px dashed #dedfe5;
+  font-size: 12px;
+}
+.vy-receipt-amounts .is-strong {
+  padding-top: 5px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.vy-receipt-amounts .is-strong dt {
+  color: var(--vy-brown);
+}
+.vy-receipt-amounts .is-strong .vy-price {
+  font-size: 14px;
+}
+.vy-receipt-note {
+  border: 1px solid #f2e5de;
+  border-radius: 12px;
+  background: #fbf7f3;
+  padding: 12px;
+  margin: 18px 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #786451;
+}
+.vy-receipt-footer {
+  border-top: 1px dashed #dedfe5;
+  padding-top: 22px;
+  margin-top: 22px;
+  text-align: center;
+}
+.vy-receipt-footer strong {
+  font-size: 13px;
+  color: var(--vy-brown);
+  font-weight: 600;
+}
+.vy-receipt-footer p {
+  font-size: 11px;
+  color: var(--vy-muted);
+  margin-top: 10px;
+  line-height: 1.6;
+}
+.vy-receipt-actions-host {
+  min-height: 130px;
+  padding-top: 20px;
+}
+.vy-receipt-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+@media (min-width: 600px) {
+  .vy-receipt-screen {
+    margin-top: 25px;
+  }
+  .vy-receipt-actions {
+    flex-direction: row;
+  }
+  .vy-receipt-actions > .vy-button {
+    flex: 1;
+    font-size: 12px;
+    padding: 12px;
+  }
+}
+@media (max-width: 380px) {
+  .vy-receipt-paper {
+    padding: 30px 15px 22px;
+  }
+  .vy-receipt-meta dd {
+    max-width: 120px;
+  }
+  .vy-header h1 {
+    font-size: 16px;
+  }
+  .vy-print-window {
+    width: calc(100% - 20px);
   }
 }
